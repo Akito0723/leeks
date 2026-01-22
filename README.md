@@ -101,4 +101,4 @@ bug fix from [DAIE](https://github.com/DA1Y1)
 - v2.0.2  
 兼容成本为负的情况 from [bu6030](https://github.com/bu6030)
 - v3.0.0
-- 修复 ```com.intellij.diagnostic.PluginException: No display name specified in plugin descriptor XML file for configurable SettingsWindow; specify it using 'displayName' or 'key' attribute to avoid necessity to load the configurable class when Settings dialog is opened```
+- `gradle`升级到8.7, `org.jetbrains.intellij`升级到1.17.4, 兼容范围变更为 `IDEA 2021.1` - `IDEA 2025.3`

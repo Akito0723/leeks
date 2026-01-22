@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.huage2580'
-version = project.findProperty('pluginVersion') ?: '3.0.0'
+version = project.findProperty('pluginVersion') ?: 'dev'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -41,10 +41,11 @@ patchPluginXml {
         v1.5 增加了股票界面的排序~，可按净值和涨跌幅等列排序
         v1.6 样式修改，增加精确净值（当日，上一交易日
         v1.7 设置界面样式调整，增加新浪股票接口备选
-        v3.0.0 修复 `com.intellij.diagnostic.PluginException: No display name` 异常
+        v3.0.0 `gradle`升级到8.7, `org.jetbrains.intellij`升级到1.17.4, 兼容范围变更为 `IDEA 2021.1` - `IDEA 2025.3`
       """
-    sinceBuild = '173.*' //最低版本限制
-    untilBuild = null //最高版本限制 好像必须指定
+    sinceBuild = '211.*' //最低版本限制 (2021.1.1)
+    untilBuild = null
+    updateSinceUntilBuild = false
 }
 
 tasks.withType(JavaCompile) {
