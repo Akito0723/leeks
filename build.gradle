@@ -45,7 +45,6 @@ patchPluginXml {
       """
     sinceBuild = '211.*' //最低版本限制 (2021.1.1)
     untilBuild = null
-    updateSinceUntilBuild = false
 }
 
 tasks.withType(JavaCompile) {
