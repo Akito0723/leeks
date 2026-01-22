@@ -1,2 +1,11 @@
-rootProject.name = 'leeks'
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        maven { url "https://packages.jetbrains.team/maven/p/ij/intellij-plugin-service" }
+        maven { url "https://cache-redirector.jetbrains.com/intellij-dependencies" }
+        maven { url "https://cache-redirector.jetbrains.com/intellij-repository/releases" }
+    }
+}
 
+rootProject.name = 'leeks'

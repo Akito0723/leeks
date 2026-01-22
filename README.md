@@ -1,15 +1,12 @@
 # leeks
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/huage2580/leeks?label=RELEASE&style=flat-square&logo=github&color=green)
-![star](https://img.shields.io/github/stars/huage2580/leeks?style=flat-square&logo=github)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/Akito0723/leeks?label=RELEASE&style=flat-square&logo=github&color=green)
+![star](https://img.shields.io/github/stars/Akito0723/leeks?style=flat-square&logo=github)
 
-idea插件，查看基金，股票：支持A股，港股，美股  
-
-## 请先阅读完readme，确保编码正确输入  
-提issues附上:使用的插件版本、IDEA详细的版本信息(到Help->about里面复制出来)，如果【Event Log】有异常信息，也请在issues附上异常  
+idea插件，查看基金，股票：支持A股，港股，美股
 
 ## 安装   
-[插件下载地址](https://github.com/huage2580/leeks/releases)  
+[插件下载地址](https://github.com/Akito0723/leeks/releases)  
 找到 leeks-x.x.x.zip 下载后，直接在IDEA里面安装（安装方式自行百度），注意：直接选择zip文件安装，不要解压。  
 
 ## 使用  
@@ -64,11 +61,11 @@ double shift，连按两下shift，输入leeks，找到toolWindow，打开以后
 支持了港股和美股 示例代码：（sh000001,sh600519,sz000001,hk00700,usAAPL）代码一般可以在各网页端看得到  
 - v1.3    
 插件由小韭菜更名为Leeks
-支持了IDEA 2020.1.3,兼容到`IDEA 2017.3`，修复macOS 行高问题 
+支持了`IDEA 2020.1.3`,兼容到`IDEA 2017.3`，修复macOS 行高问题 
 - v1.4.1   
 增加了隐蔽模式（全拼音和无色涨跌幅
 - v1.4.2  
-支持到IDEA 2020.2.*
+支持到`IDEA 2020.2.*`
 - v1.5.1  
 增加了股票界面按表头排序，设置界面及时生效，不用点击refresh按钮啦  merge from [dengerYang](https://github.com/dengerYang)  
 - v1.5.2  
@@ -76,7 +73,7 @@ double shift，连按两下shift，输入leeks，找到toolWindow，打开以后
 - v1.6.1  
 样式和bug fix,(样式调整，增加当日净值merge from [dengerYang](https://github.com/dengerYang) )      
 - v1.6.2  
-适配IDEA 2020.3  
+适配`IDEA 2020.3` 
 - v1.6.3  
 修复颜色错乱问题 , 日志调整 merge from [qwn3213](https://github.com/qwn3213)  
 - v1.7.1  
@@ -103,12 +100,5 @@ bug fix from [DAIE](https://github.com/DA1Y1)
 支持自定义更新的时间段 from [dengerYang](https://github.com/dengerYang)  
 - v2.0.2  
 兼容成本为负的情况 from [bu6030](https://github.com/bu6030)
-
-
-
-
-
-
-
-
-
+- v3.0.0
+- 修复 ```com.intellij.diagnostic.PluginException: No display name specified in plugin descriptor XML file for configurable SettingsWindow; specify it using 'displayName' or 'key' attribute to avoid necessity to load the configurable class when Settings dialog is opened```
