@@ -14,6 +14,7 @@ java {
 repositories {
     mavenCentral()
     jcenter()
+    maven { url "https://jitpack.io" }
     maven { url "https://cache-redirector.jetbrains.com/intellij-dependencies" }
     maven { url "https://cache-redirector.jetbrains.com/intellij-repository/releases" }
 }
