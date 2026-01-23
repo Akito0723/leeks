@@ -66,6 +66,6 @@ public class YahooCoinHandler extends CoinRefreshHandler {
 
     @Override
     public void stopHandle() {
-        LogUtil.info("leeks stock 自动刷新关闭!");
+		LogUtil.info("Leeks 停止更新Coin数据.");
     }
 }

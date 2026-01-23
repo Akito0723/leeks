@@ -35,7 +35,6 @@ public abstract class FundRefreshHandler extends DefaultTableModel {
             instance.setValue(WindowUtils.FUND_TABLE_HEADER_KEY, WindowUtils.FUND_TABLE_HEADER_VALUE);
             tableHeader = WindowUtils.FUND_TABLE_HEADER_VALUE;
         }
-		LogUtil.info(tableHeader);
         String[] configStr = tableHeader.split(",");
         columnNames = new String[configStr.length];
         for (int i = 0; i < configStr.length; i++) {

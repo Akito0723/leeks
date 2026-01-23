@@ -82,7 +82,7 @@ public class QuartzManager {
                 if (dataMap != null && !dataMap.isEmpty()) {
                     detail.getJobDataMap().putAll(dataMap);
                 }
-                LogUtil.info("创建任务 [ " + cron + " ] " + dataMap.get(HandlerJob.KEY_HANDLER).getClass().getSimpleName());
+                LogUtil.info("Leeks 创建定时任务 [ " + cron + " ] " + dataMap.get(HandlerJob.KEY_HANDLER).getClass().getSimpleName());
                 sched.scheduleJob(detail, TriggerBuilder.newTrigger().withSchedule(CronScheduleBuilder.cronSchedule(cron)).build());
             }
             // 启动

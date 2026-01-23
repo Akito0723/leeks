@@ -12,6 +12,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import quartz.HandlerJob;
 import quartz.QuartzManager;
+import utils.LogUtil;
 import utils.WindowUtils;
 
 import javax.swing.*;
@@ -105,6 +106,7 @@ public class CoinWindow {
             handler.refreshColorful(instance.getBoolean("key_colorful"));
             List<String> codes = loadCoins();
             if (CollectionUtils.isEmpty(codes)) {
+				LogUtil.info("Leeks Coin Code配置为空");
                 stop(); //如果没有数据则不需要启动时钟任务浪费资源
             } else {
                 handler.handle(codes);

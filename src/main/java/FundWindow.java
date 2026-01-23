@@ -201,6 +201,7 @@ public class FundWindow implements ToolWindowFactory {
             fundRefreshHandler.refreshColorful(colorful);
             List<String> codes = loadFunds();
             if (CollectionUtils.isEmpty(codes)) {
+				LogUtil.info("Leeks Fund Code配置为空");
                 stop(); //如果没有数据则不需要启动时钟任务浪费资源
             } else {
                 fundRefreshHandler.handle(codes);

@@ -55,7 +55,7 @@ public class TencentStockHandler extends StockRefreshHandler {
 
     @Override
     public void stopHandle() {
-        LogUtil.info("Leeks 准备停止更新Stock编码数据.");
+		LogUtil.info("Leeks 停止更新Stock数据.");
     }
 
     private void stepAction() {

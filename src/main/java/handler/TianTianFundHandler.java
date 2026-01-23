@@ -63,7 +63,7 @@ public class TianTianFundHandler extends FundRefreshHandler {
 
     @Override
     public void stopHandle() {
-        LogUtil.info("Leeks 准备停止更新Fund编码数据.");
+        LogUtil.info("Leeks 停止更新Fund数据.");
     }
 
     private void stepAction(List<String> codes) {
