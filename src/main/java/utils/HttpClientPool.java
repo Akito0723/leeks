@@ -23,7 +23,8 @@ import java.util.concurrent.TimeUnit;
 public class HttpClientPool {
 
     private static volatile HttpClientPool clientInstance;
-    private HttpClient httpClient;
+    private CloseableHttpClient httpClient;
+    private PoolingHttpClientConnectionManager connectionManager;
 
     public static HttpClientPool getHttpClient() {
         HttpClientPool tmp = clientInstance;
@@ -43,12 +44,14 @@ public class HttpClientPool {
         buildHttpClient(null);
     }
 
-    public void buildHttpClient(String proxyStr){
-        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(100, TimeUnit.SECONDS);
-        connectionManager.setMaxTotal(200);// 连接池
-        connectionManager.setDefaultMaxPerRoute(100);// 每条通道的并发连接数
+    public synchronized void buildHttpClient(String proxyStr){
+        CloseableHttpClient oldClient = this.httpClient;
+        PoolingHttpClientConnectionManager oldManager = this.connectionManager;
+        PoolingHttpClientConnectionManager newManager = new PoolingHttpClientConnectionManager(100, TimeUnit.SECONDS);
+        newManager.setMaxTotal(200);// 连接池
+        newManager.setDefaultMaxPerRoute(100);// 每条通道的并发连接数
         RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(2000).setSocketTimeout(2000).build();
-        HttpClientBuilder httpClientBuilder = HttpClients.custom().setConnectionManager(connectionManager);
+        HttpClientBuilder httpClientBuilder = HttpClients.custom().setConnectionManager(newManager);
         if (proxyStr!=null && !proxyStr.isEmpty()){
             String[] s = proxyStr.split(":");
             if (s.length == 2){
@@ -58,7 +61,18 @@ public class HttpClientPool {
             }
             LogUtil.info("Leeks setup proxy success->"+proxyStr);
         }
-        httpClient =httpClientBuilder.setDefaultRequestConfig(requestConfig).build();
+        httpClient = httpClientBuilder.setDefaultRequestConfig(requestConfig).build();
+        connectionManager = newManager;
+        if (oldClient != null) {
+            try {
+                oldClient.close();
+            } catch (Exception ignored) {
+                // best-effort close to avoid leaking connections
+            }
+        }
+        if (oldManager != null) {
+            oldManager.close();
+        }
     }
 
     public String get(String url) throws Exception {

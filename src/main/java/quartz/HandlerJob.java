@@ -24,7 +24,7 @@ import utils.LogUtil;
  *                 dataMap.put(HandlerJob.KEY_CODES, codes);
  *                 quartzManager.runJob(HandlerJob.class, instance.getValue("key_cron_expression_stock"), dataMap); // 添加任务并执行
  * </pre>
- * 请参考文档 http://www.quartz-scheduler.org/documentation
+ * 请参考文档 <a href="http://www.quartz-scheduler.org/documentation">...</a>
  *
  * @author dengerYang
  * @date 2021年12月27日
@@ -47,10 +47,10 @@ public class HandlerJob implements Job {
                 ((CoinRefreshHandler) handler).handle(codes);
             }
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            LogUtil.info(String.format("%s 运行 %s ;下一次运行时间为 %s",
-                    simpleDateFormat.format(new Date()),
-                    handler == null ? "null" : handler.getClass().getSimpleName(),
-                    simpleDateFormat.format(context.getNextFireTime())));
+//            LogUtil.info(String.format("%s 运行 %s ;下一次运行时间为 %s",
+//                    simpleDateFormat.format(new Date()),
+//                    handler == null ? "null" : handler.getClass().getSimpleName(),
+//                    simpleDateFormat.format(context.getNextFireTime())));
         } catch (Exception e) {
             LogUtil.info("刷新出现异常：" + ExceptionUtil.getMessage(e) + "\r\n" + ExceptionUtil.currentStackTrace());
             throw new JobExecutionException(e);

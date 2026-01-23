@@ -21,27 +21,27 @@ public class WindowUtils {
     private static HashMap<String,String> remapPinYinMap = new HashMap<>();
 
     static {
-        remapPinYinMap.put(PinYinUtils.toPinYin("编码"), "编码");
-        remapPinYinMap.put(PinYinUtils.toPinYin("基金名称"), "基金名称");
-        remapPinYinMap.put(PinYinUtils.toPinYin("估算净值"), "估算净值");
-        remapPinYinMap.put(PinYinUtils.toPinYin("估算涨跌"), "估算涨跌");
-        remapPinYinMap.put(PinYinUtils.toPinYin("更新时间"), "更新时间");
-        remapPinYinMap.put(PinYinUtils.toPinYin("当日净值"), "当日净值");
-        remapPinYinMap.put(PinYinUtils.toPinYin("股票名称"), "股票名称");
-        remapPinYinMap.put(PinYinUtils.toPinYin("当前价"), "当前价");
-        remapPinYinMap.put(PinYinUtils.toPinYin("涨跌"), "涨跌");
-        remapPinYinMap.put(PinYinUtils.toPinYin("涨跌幅"), "涨跌幅");
-        remapPinYinMap.put(PinYinUtils.toPinYin("最高价"), "最高价");
-        remapPinYinMap.put(PinYinUtils.toPinYin("最低价"), "最低价");
-        remapPinYinMap.put(PinYinUtils.toPinYin("名称"), "名称");
+        addPinyinMapping("编码");
+        addPinyinMapping("基金名称");
+        addPinyinMapping("估算净值");
+        addPinyinMapping("估算涨跌");
+        addPinyinMapping("更新时间");
+        addPinyinMapping("当日净值");
+        addPinyinMapping("股票名称");
+        addPinyinMapping("当前价");
+        addPinyinMapping("涨跌");
+        addPinyinMapping("涨跌幅");
+        addPinyinMapping("最高价");
+        addPinyinMapping("最低价");
+        addPinyinMapping("名称");
 
-        remapPinYinMap.put(PinYinUtils.toPinYin("成本价"), "成本价");
-        remapPinYinMap.put(PinYinUtils.toPinYin("持仓"), "持仓");
-        remapPinYinMap.put(PinYinUtils.toPinYin("收益率"), "收益率");
-        remapPinYinMap.put(PinYinUtils.toPinYin("收益"), "收益");
+        addPinyinMapping("成本价");
+        addPinyinMapping("持仓");
+        addPinyinMapping("收益率");
+        addPinyinMapping("收益");
 
-        remapPinYinMap.put(PinYinUtils.toPinYin("持仓成本价"), "持仓成本价");
-        remapPinYinMap.put(PinYinUtils.toPinYin("持有份额"), "持有份额");
+        addPinyinMapping("持仓成本价");
+        addPinyinMapping("持有份额");
     }
 
 
@@ -64,7 +64,22 @@ public class WindowUtils {
     }
 
     public static String remapPinYin(String pinyin) {
-        return remapPinYinMap.getOrDefault(pinyin, pinyin);
+        if (pinyin == null) {
+            return null;
+        }
+        String normalized = pinyin.toLowerCase();
+        String mapped = remapPinYinMap.get(normalized);
+        if (mapped != null) {
+            return mapped;
+        }
+        String noUnderscore = normalized.replace("_", "");
+        return remapPinYinMap.getOrDefault(noUnderscore, pinyin);
+    }
+
+    private static void addPinyinMapping(String chinese) {
+        String pinyin = PinYinUtils.toPinYin(chinese);
+        remapPinYinMap.put(pinyin, chinese);
+        remapPinYinMap.put(pinyin.replace("_", ""), chinese);
     }
 
 

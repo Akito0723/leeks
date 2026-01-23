@@ -15,10 +15,33 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TianTianFundHandler extends FundRefreshHandler {
     public final static DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
     private static Gson gson = new Gson();
+    private static final ThreadPoolExecutor FETCH_EXECUTOR = new ThreadPoolExecutor(
+            2,
+            8,
+            60L,
+            TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(256),
+            new ThreadFactory() {
+                private final AtomicInteger index = new AtomicInteger(1);
+
+                @Override
+                public Thread newThread(Runnable r) {
+                    Thread thread = new Thread(r, "leeks-fund-refresh-" + index.getAndIncrement());
+                    thread.setDaemon(true);
+                    return thread;
+                }
+            },
+            new ThreadPoolExecutor.CallerRunsPolicy()
+    );
 
     private JLabel refreshTimeLabel;
 
@@ -60,7 +83,7 @@ public class TianTianFundHandler extends FundRefreshHandler {
         }
 
         for (String code : codeList) {
-            new Thread(() -> {
+            FETCH_EXECUTOR.execute(() -> {
                 try {
                     String result = HttpClientPool.getHttpClient().get("http://fundgz.1234567.com.cn/js/" + code + ".js?rt=" + System.currentTimeMillis());
                     String json = result.substring(8, result.length() - 2);
@@ -99,7 +122,7 @@ public class TianTianFundHandler extends FundRefreshHandler {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }).start();
+            });
         }
         updateUI();
     }

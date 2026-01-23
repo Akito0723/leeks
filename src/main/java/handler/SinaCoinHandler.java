@@ -15,8 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 @Deprecated
 public class SinaCoinHandler extends CoinRefreshHandler {
-    private final String URL = "http://hq.sinajs.cn/list=";
-    //private static final Pattern DEFAULT_STOCK_PATTERN = Pattern.compile("var hq_str_(\\w+?)=\"(.*?)\";");
+	//private static final Pattern DEFAULT_STOCK_PATTERN = Pattern.compile("var hq_str_(\\w+?)=\"(.*?)\";");
     private final JLabel refreshTimeLabel;
 
     public SinaCoinHandler(JTable table, JLabel label) {
@@ -36,7 +35,8 @@ public class SinaCoinHandler extends CoinRefreshHandler {
     private void pollStock(List<String> code) {
         String params = Joiner.on(",").join(code);
         try {
-            String res = HttpClientPool.getHttpClient().get(URL + params);
+			String URL = "http://hq.sinajs.cn/list=";
+			String res = HttpClientPool.getHttpClient().get(URL + params);
 //            String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss,SSS"));
 //            System.out.printf("%s,%s%n", time, res);
             handleResponse(res);

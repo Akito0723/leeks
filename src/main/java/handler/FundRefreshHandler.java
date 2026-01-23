@@ -6,6 +6,7 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.table.JBTable;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import utils.LogUtil;
 import utils.PinYinUtils;
 import utils.WindowUtils;
 
@@ -34,6 +35,7 @@ public abstract class FundRefreshHandler extends DefaultTableModel {
             instance.setValue(WindowUtils.FUND_TABLE_HEADER_KEY, WindowUtils.FUND_TABLE_HEADER_VALUE);
             tableHeader = WindowUtils.FUND_TABLE_HEADER_VALUE;
         }
+		LogUtil.info(tableHeader);
         String[] configStr = tableHeader.split(",");
         columnNames = new String[configStr.length];
         for (int i = 0; i < configStr.length; i++) {

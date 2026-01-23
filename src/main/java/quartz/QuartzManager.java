@@ -10,7 +10,7 @@ import org.quartz.impl.StdSchedulerFactory;
 import utils.LogUtil;
 
 /**
- * 任务管理，请参考文档 http://www.quartz-scheduler.org/documentation
+ * 任务管理，请参考文档 <a href="http://www.quartz-scheduler.org/documentation">...</a>
  *
  * @author dengerYang
  * @date 2021年12月27日
