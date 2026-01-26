@@ -3,7 +3,7 @@ package quartz;
 import java.text.ParseException;
 import java.util.Map;
 import java.util.Properties;
-
+import com.intellij.openapi.diagnostic.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
@@ -17,7 +17,10 @@ import utils.LogUtil;
  */
 public class QuartzManager {
 
-    private Scheduler sched = null;
+	private static final Logger log = Logger.getInstance(QuartzManager.class);
+
+
+	private Scheduler sched = null;
     private String instanceName;
 
     private QuartzManager() {
@@ -35,10 +38,11 @@ public class QuartzManager {
      */
     public static QuartzManager getInstance(String instanceName) {
         try {
-            return getInstance(instanceName, 1); //线程能满足资源即可
+			// 线程能满足资源即可
+            return getInstance(instanceName, 1);
         } catch (SchedulerException e) {
-            e.printStackTrace();
-            throw new RuntimeException("QuartzManager初始化失败" + instanceName, e);
+			log.error("quartzManager instanceName:" + instanceName + " 初始化失败,原因:", e);
+            throw new RuntimeException("QuartzManager "+ instanceName + "初始化失败", e);
         }
     }
 
@@ -51,16 +55,15 @@ public class QuartzManager {
     }
 
     /**
-     * 检查是否符合表达式
-     *
+     * 校验 Cron 表达式
      * @param cronExpression 表达式
-     * @return true表达式正确
      */
     public static boolean checkCronExpression(String cronExpression) {
         try {
             new CronExpression(cronExpression);
             return true;
         } catch (ParseException e) {
+			log.warn("校验 Cron 表达式 ["+ cronExpression + "] 时出现异常,原因:", e);
             return false;
         }
     }
@@ -70,7 +73,7 @@ public class QuartzManager {
      *
      * @param clazz          jobCLass
      * @param cronExpression cron表达式，支持;分隔
-     * @param dataMap        传递给job的参数
+     * @param dataMap        传递给 job 的参数
      */
     public void runJob(Class<? extends Job> clazz, @NotNull String cronExpression, Map<? extends String, ?> dataMap) {
         try {
@@ -90,18 +93,19 @@ public class QuartzManager {
                 sched.start();
             }
         } catch (SchedulerException e) {
-            e.printStackTrace();
-            throw new RuntimeException("添加定时任务失败", e);
+			log.error("quartzManager instanceName:" + this.instanceName + "执行定时任务失败,原因:", e);
+			throw new RuntimeException("QuartzManager "+ instanceName + "执行定时任务失败", e);
         }
     }
 
     public void stopJob() {
         try {
-            sched.clear(); // 清除资源
+			// 清除资源
+            sched.clear();
             sched.shutdown();
         } catch (SchedulerException e) {
-            e.printStackTrace();
-            throw new RuntimeException("停止定时任务失败", e);
+			log.error("quartzManager instanceName:" + this.instanceName + "停止定时任务失败,原因:", e);
+			throw new RuntimeException("QuartzManager "+ instanceName + "停止定时任务失败", e);
         }
     }
 }

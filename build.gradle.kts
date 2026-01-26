@@ -11,7 +11,8 @@ plugins {
     alias(libs.plugins.kover) // Gradle Kover Plugin
 }
 group = providers.gradleProperty("pluginGroup").get()
-version = project.findProperty('pluginVersion') ? : providers.gradleProperty("pluginVersion").get()
+version = (project.findProperty("pluginVersion") as String?)
+    ?: providers.gradleProperty("pluginVersion").get()
 
 // Set the JVM language level used to build the project.
 kotlin {
@@ -21,7 +22,7 @@ kotlin {
 // Configure project's dependencies
 repositories {
     mavenCentral()
-
+    maven { url = uri("https://maven.aliyun.com/repository/public") }
     // IntelliJ Platform Gradle Plugin Repositories Extension - read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-repositories-extension.html
     intellijPlatform {
         defaultRepositories()
@@ -48,16 +49,27 @@ dependencies {
 
         testFramework(TestFrameworkType.Platform)
     }
+
+    // TinyPinyin核心包，约80KB
+    implementation("com.github.promeg:tinypinyin:2.0.3")
+    // 定时任务
+    implementation("org.quartz-scheduler:quartz:2.3.2") {
+        exclude(group = "com.zaxxer")
+        // 与idea插件冲突
+        exclude(group = "org.slf4j")
+        exclude(group = "com.mchange")
+    }
 }
 
 // Configure IntelliJ Platform Gradle Plugin - read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-extension.html
 intellijPlatform {
     pluginConfiguration {
         name = providers.gradleProperty("pluginName")
-        version = project.findProperty('pluginVersion') ? : providers.gradleProperty("pluginVersion").get()
+        version = (project.findProperty("pluginVersion") as String?)
+            ?: providers.gradleProperty("pluginVersion").get()
 
         // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
-        description = providers.fileContents(layout.projectDirectory.file("README.md")).asText.map {
+        description = providers.fileContents(layout.projectDirectory.file("IDEA_PLUGIN_README.md")).asText.map {
             val start = "<!-- Plugin description -->"
             val end = "<!-- Plugin description end -->"
 

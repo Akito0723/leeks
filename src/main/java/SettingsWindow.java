@@ -1,7 +1,7 @@
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 import quartz.QuartzManager;
@@ -161,23 +161,23 @@ public class SettingsWindow  implements Configurable {
     private String checkConfig() {
         StringBuilder errorMsg = new StringBuilder();
         errorMsg.append(getConfigList(cronExpressionFund.getText(), ";").stream().map(s -> {
-            if (!QuartzManager.checkCronExpression(s)) {
-                return "Fund请配置正确的cron表达式[" + s + "]、";
+            if (QuartzManager.checkCronExpression(s)) {
+				return "";
             } else {
-                return "";
+				return "Fund请配置正确的cron表达式[" + s + "]、";
             }
         }).collect(Collectors.joining())); errorMsg.append(getConfigList(cronExpressionStock.getText(), ";").stream().map(s -> {
-            if (!QuartzManager.checkCronExpression(s)) {
-                return "Stock请配置正确的cron表达式[" + s + "]、";
+            if (QuartzManager.checkCronExpression(s)) {
+				return "";
             } else {
-                return "";
+				return "Stock请配置正确的cron表达式[" + s + "]、";
             }
         }).collect(Collectors.joining()));
         errorMsg.append(getConfigList(cronExpressionCoin.getText(), ";").stream().map(s -> {
-            if (!QuartzManager.checkCronExpression(s)) {
-                return "Coin请配置正确的cron表达式[" + s + "]、";
+            if (QuartzManager.checkCronExpression(s)) {
+				return "";
             } else {
-                return "";
+				return "Coin请配置正确的cron表达式[" + s + "]、";
             }
         }).collect(Collectors.joining()));
         return errorMsg.toString();

@@ -5,7 +5,7 @@ import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.notification.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 

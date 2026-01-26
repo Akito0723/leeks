@@ -2,7 +2,7 @@
 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/Akito0723/leeks?label=RELEASE&style=flat-square&logo=github&color=green)
 ![star](https://img.shields.io/github/stars/Akito0723/leeks?style=flat-square&logo=github)
-<!-- Plugin description -->
+
 <H2>idea插件，查看基金，股票：支持A股，港股，美股  
 
 ## 说明  

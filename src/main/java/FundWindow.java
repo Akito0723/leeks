@@ -17,7 +17,7 @@ import com.intellij.ui.content.ContentManager;
 import com.intellij.ui.table.JBTable;
 import handler.TianTianFundHandler;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import quartz.HandlerJob;
