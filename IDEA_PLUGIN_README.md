@@ -1,6 +1,7 @@
 <!-- Plugin description -->
-<H2>IDEA插件，查看基金，股票：支持A股，港股，美股  
-
+IDEA插件，提供基金和股票的实时行情查看  
+韭菜专用摸鱼插件!  
+good luck!  
 本项目forked from [github.com/huage2580/leeks](https://github.com/huage2580/leeks)  
 
 ## 安装   
