@@ -4,9 +4,11 @@
 
 ## [Unreleased]
 
-- 当前为开发中版本...
-- 新intellijPlatform API适配
-- 优化线程池与定时任务逻辑
+- [ ] intellijPlatform API 更新
+- [x] 优化`hander`线程池与定时任务线程逻辑
+- [x] 对齐 `coin,stock,fund` 抽象架构
+- [ ] 增加 `eastmoney.com` 数据源
+- [ ] 设置页面支持 多个 API 数据源选择
 
 
 ## [3.0.0]

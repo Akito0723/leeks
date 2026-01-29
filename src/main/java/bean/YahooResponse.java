@@ -1,26 +1,22 @@
 package bean;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
+@Getter
+@Setter
 public class YahooResponse {
-    Result quoteResponse;
 
-    public YahooResponse() {
-    }
+    private Result quoteResponse;
 
-    public Result getQuoteResponse() {
-        return quoteResponse;
-    }
-
-    public static class Result{
-        public Result() {
-        }
+	@Getter
+	@Setter
+    public static class Result {
 
         private List<CoinBean> result;
 
-        public List<CoinBean> getResult() {
-            return result;
-        }
     }
 }
 

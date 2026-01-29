@@ -7,6 +7,7 @@ import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.tabs.TabInfo;
 import com.intellij.ui.tabs.TabsListener;
 import com.intellij.ui.tabs.impl.JBTabsImpl;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
@@ -16,7 +17,7 @@ import java.net.URL;
 
 /**
  * intellij ui 弹窗展示工具类 <br>
- * https://plugins.jetbrains.com/docs/intellij/popups.html#popups
+ * <a href="https://plugins.jetbrains.com/docs/intellij/popups.html#popups">...</a>
  */
 public class PopupsUiUtil {
     /**
@@ -144,54 +145,50 @@ public class PopupsUiUtil {
                 .createBalloon().show(RelativePoint.fromScreen(showByPoint), Balloon.Position.atRight);
     }
 
-    public enum FundShowType {
+	public interface BaseShowType {
+		String getDesc();
+	}
+
+	@Getter
+    public enum FundShowType implements BaseShowType {
         /**
          * 净值估算图
          */
         gsz("净值估算图");
-        private String desc;
+        private final String desc;
 
         FundShowType(String desc) {
             this.desc = desc;
         }
 
-        public String getDesc() {
-            return desc;
-        }
-    }
+	}
 
-    public enum StockShowType {
+    @Getter
+	public enum StockShowType  implements BaseShowType{
         /**
          * 分时线图
          */
         min("min", "分时线图"),
         /**
-         * 日K线图
+         * 日K 线图
          */
         daily("daily", "日K线图"),
         /**
-         * 周K线图
+         * 周K 线图
          */
         weekly("weekly", "周K线图"),
         /**
-         * 月K线图
+         * 月K 线图
          */
         monthly("monthly", "月K线图");
 
-        private String type;
-        private String desc;
+        private final String type;
+        private final String desc;
 
         StockShowType(String type, String desc) {
             this.type = type;
             this.desc = desc;
         }
 
-        public String getType() {
-            return type;
-        }
-
-        public String getDesc() {
-            return desc;
-        }
-    }
+	}
 }

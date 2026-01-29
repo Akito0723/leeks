@@ -1,6 +1,13 @@
+import com.intellij.ide.DataManager;
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.ToolWindowManager;
+import handler.stock.impl.SinaStockTableHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
@@ -17,8 +24,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class SettingsWindow  implements Configurable {
-    private JPanel panel1;
+public class SettingsWindow implements Configurable {
+
+	private static final Logger log = Logger.getInstance(SettingsWindow.class);
+
+
+	private JPanel panel1;
     private JTextArea textAreaFund;
     private JTextArea textAreaStock;
     private JCheckBox checkbox;
@@ -96,27 +107,38 @@ public class SettingsWindow  implements Configurable {
         String proxy = inputProxy.getText().trim();
         instance.setValue("key_proxy",proxy);
         HttpClientPool.getHttpClient().buildHttpClient(proxy);
-        StockWindow.apply();
-        FundWindow.apply();
-        CoinWindow.apply();
+
+		Project project = CommonDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext(panel1));
+		if (project != null) {
+			ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow("leeks");
+			FundWindow fundWindow = FundWindow.getInstance(project);
+			if (fundWindow != null) {
+				fundWindow.apply();
+				fundWindow.getCoinWindow().apply();
+				fundWindow.getCoinWindow().apply();
+			}
+		}
+
+
+
     }
 
 
-    private void testProxy(String proxy){
-        if (proxy.indexOf('：')>0){
-            LogUtil.notify("别用中文分割符啊!",false);
-            return;
-        }
-        HttpClientPool httpClientPool = HttpClientPool.getHttpClient();
-        httpClientPool.buildHttpClient(proxy);
-        try {
-            httpClientPool.get("https://www.baidu.com");
-            LogUtil.notify("代理测试成功!请保存",true);
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogUtil.notify("测试代理异常!",false);
-        }
-    }
+	private void testProxy(String proxy) {
+		if (proxy.indexOf('：') > 0) {
+			LogUtil.notifyInfo("别用中文分割符啊!");
+			return;
+		}
+		HttpClientPool httpClientPool = HttpClientPool.getHttpClient();
+		httpClientPool.buildHttpClient(proxy);
+		try {
+			httpClientPool.get("https://www.baidu.com");
+			LogUtil.notifyInfo("代理测试成功!请保存");
+		} catch (Exception e) {
+			log.error("代理测试异常,原因:", e);
+			LogUtil.notifyInfo("测试代理异常!");
+		}
+	}
 
     public static List<String> getConfigList(String key, String split) {
         String value = PropertiesComponent.getInstance().getValue(key);

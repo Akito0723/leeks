@@ -2,7 +2,6 @@ package utils;
 
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -59,7 +58,7 @@ public class HttpClientPool {
                 int port = Integer.parseInt(s[1]);
                 httpClientBuilder.setProxy(new HttpHost(host,port));
             }
-            LogUtil.info("Leeks setup proxy success->"+proxyStr);
+            LogUtil.notifyInfo("setup proxy success->" + proxyStr);
         }
         httpClient = httpClientBuilder.setDefaultRequestConfig(requestConfig).build();
         connectionManager = newManager;
@@ -91,7 +90,7 @@ public class HttpClientPool {
             response = httpClient.execute(request);
             return EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
         } catch (Exception e) {
-            throw new Exception("got an error from HTTP for url : " + URLDecoder.decode(url, "UTF-8"),e);
+            throw new Exception("got an error from HTTP for url : " + URLDecoder.decode(url, StandardCharsets.UTF_8), e);
         } finally {
             if(response != null){
                 EntityUtils.consumeQuietly(response.getEntity());

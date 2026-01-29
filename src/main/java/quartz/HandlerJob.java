@@ -1,17 +1,11 @@
 package quartz;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.ExceptionUtil;
-import handler.CoinRefreshHandler;
-import handler.FundRefreshHandler;
-import handler.StockRefreshHandler;
-import org.quartz.Job;
-import org.quartz.JobDataMap;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
+import handler.BaseTableRefreshHandler;
+import org.quartz.*;
 import utils.LogUtil;
 
 /**
@@ -29,31 +23,31 @@ import utils.LogUtil;
  * @author dengerYang
  * @date 2021年12月27日
  */
+@DisallowConcurrentExecution
 public class HandlerJob implements Job {
-    public static final String KEY_HANDLER = "handler";
-    public static final String KEY_CODES = "codes";
+
+	public static final String KEY_HANDLER = "handler";
+
+	public static final String KEY_CODES = "codes";
+
+	private static final Logger log = Logger.getInstance(HandlerJob.class);
 
     @Override
+	@SuppressWarnings("unchecked")
     public void execute(JobExecutionContext context) throws JobExecutionException {
+		JobDataMap dataMap = context.getMergedJobDataMap();
         try {
-            JobDataMap mergedJobDataMap = context.getMergedJobDataMap();
-            Object handler = mergedJobDataMap.get(KEY_HANDLER);
-            List<String> codes = (List<String>) mergedJobDataMap.get(KEY_CODES);
-            if (handler instanceof StockRefreshHandler) {
-                ((StockRefreshHandler) handler).handle(codes);
-            } else if (handler instanceof FundRefreshHandler) {
-                ((FundRefreshHandler) handler).handle(codes);
-            } else if (handler instanceof CoinRefreshHandler) {
-                ((CoinRefreshHandler) handler).handle(codes);
+            Object handler = dataMap.get(KEY_HANDLER);
+			List<String> configCodeList = (List<String>) dataMap.get(KEY_CODES);
+
+            if (handler instanceof BaseTableRefreshHandler) {
+                ((BaseTableRefreshHandler) handler).refreshTableUIData(configCodeList);
             }
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//            LogUtil.info(String.format("%s 运行 %s ;下一次运行时间为 %s",
-//                    simpleDateFormat.format(new Date()),
-//                    handler == null ? "null" : handler.getClass().getSimpleName(),
-//                    simpleDateFormat.format(context.getNextFireTime())));
+
         } catch (Exception e) {
-            LogUtil.info("刷新出现异常：" + ExceptionUtil.getMessage(e) + "\r\n" + ExceptionUtil.currentStackTrace());
-            throw new JobExecutionException(e);
+			log.error("刷新出现异常,原因:", e);
+            LogUtil.notifyInfo("刷新出现异常：" + ExceptionUtil.getMessage(e) + "\r\n" + ExceptionUtil.currentStackTrace());
+			throw new JobExecutionException(e);
         }
     }
 }

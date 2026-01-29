@@ -19,12 +19,9 @@ public class QuartzManager {
 
 	private static final Logger log = Logger.getInstance(QuartzManager.class);
 
-
 	private Scheduler sched = null;
-    private String instanceName;
 
-    private QuartzManager() {
-    }
+    private String instanceName;
 
     private QuartzManager(Scheduler sched, String instanceName) {
         this.sched = sched;
@@ -84,17 +81,22 @@ public class QuartzManager {
                 JobDetail detail = JobBuilder.newJob(clazz).withIdentity(instanceName + i).build();
                 if (dataMap != null && !dataMap.isEmpty()) {
                     detail.getJobDataMap().putAll(dataMap);
+
                 }
-                LogUtil.info("Leeks 创建定时任务 [ " + cron + " ] " + dataMap.get(HandlerJob.KEY_HANDLER).getClass().getSimpleName());
-                sched.scheduleJob(detail, TriggerBuilder.newTrigger().withSchedule(CronScheduleBuilder.cronSchedule(cron)).build());
+                sched.scheduleJob(detail, TriggerBuilder.newTrigger()
+						.withSchedule(CronScheduleBuilder.cronSchedule(cron)
+								// 如果错过执行时间：直接等下一次 cron 时间 避免积压补偿执行
+								.withMisfireHandlingInstructionDoNothing())
+						.build());
             }
             // 启动
             if (!sched.isShutdown()) {
+				LogUtil.notifyInfo(sched.getSchedulerName() + " 数据开始刷新");
                 sched.start();
             }
         } catch (SchedulerException e) {
-			log.error("quartzManager instanceName:" + this.instanceName + "执行定时任务失败,原因:", e);
-			throw new RuntimeException("QuartzManager "+ instanceName + "执行定时任务失败", e);
+			log.error("QuartzManager instanceName:" + this.instanceName + "执行定时任务失败,原因:", e);
+			LogUtil.notifyError("QuartzManager "+ instanceName + "执行定时任务失败");
         }
     }
 
@@ -105,7 +107,7 @@ public class QuartzManager {
             sched.shutdown();
         } catch (SchedulerException e) {
 			log.error("quartzManager instanceName:" + this.instanceName + "停止定时任务失败,原因:", e);
-			throw new RuntimeException("QuartzManager "+ instanceName + "停止定时任务失败", e);
+			LogUtil.notifyError("QuartzManager "+ instanceName + "停止定时任务失败");
         }
     }
 }
