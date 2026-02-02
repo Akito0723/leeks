@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="SettingsWindow">
-  <grid id="27dc6" binding="panel1" default-binding="true" layout-manager="FormLayout">
+  <grid id="27dc6" binding="panel" layout-manager="FormLayout">
     <rowspec value="center:max(d;4px):noGrow"/>
     <rowspec value="top:4dlu:noGrow"/>
     <rowspec value="center:max(d;4px):noGrow"/>
@@ -33,7 +33,7 @@
           <toolTipText value="采取全拼音显示，无色文本"/>
         </properties>
       </component>
-      <tabbedpane id="e57b" binding="tabbedPane1" default-binding="true">
+      <tabbedpane id="e57b" binding="tabbedPane">
         <constraints>
           <grid row="2" column="0" row-span="1" col-span="7" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
             <preferred-size width="200" height="200"/>
@@ -288,12 +288,19 @@
               <text value="表格条纹（斑马线）"/>
             </properties>
           </component>
-          <component id="8c514" class="javax.swing.JCheckBox" binding="checkboxSina">
+          <component id="38ce9" class="javax.swing.JLabel" binding="stockComboBoxLabel">
             <constraints/>
             <properties>
-              <horizontalAlignment value="2"/>
-              <horizontalTextPosition value="2"/>
-              <text value="采用新浪股票接口(无港股美股数据)"/>
+              <text value="股票接口"/>
+            </properties>
+          </component>
+          <component id="eb61f" class="javax.swing.JComboBox" binding="stockComboBox">
+            <constraints/>
+            <properties>
+              <model>
+                <item value="腾讯财经"/>
+                <item value="东方财富"/>
+              </model>
             </properties>
           </component>
           <component id="3e6da" class="javax.swing.JCheckBox" binding="checkboxLog">

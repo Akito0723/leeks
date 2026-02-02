@@ -7,7 +7,6 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
-import handler.stock.impl.SinaStockTableHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
@@ -16,8 +15,6 @@ import utils.HttpClientPool;
 import utils.LogUtil;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -29,26 +26,34 @@ public class SettingsWindow implements Configurable {
 	private static final Logger log = Logger.getInstance(SettingsWindow.class);
 
 
-	private JPanel panel1;
+	private JPanel panel;
     private JTextArea textAreaFund;
     private JTextArea textAreaStock;
     private JCheckBox checkbox;
     /**
      * 使用tab界面，方便不同的设置分开进行控制
      */
-    private JTabbedPane tabbedPane1;
+    private JTabbedPane tabbedPane;
     private JCheckBox checkBoxTableStriped;
     private JTextField cronExpressionFund;
     private JTextField cronExpressionStock;
     private JTextField cronExpressionCoin;
-    private JCheckBox checkboxSina;
+
+	private JComboBox stockComboBox;
+	private JLabel stockComboBoxLabel;
+//    private JCheckBox checkboxSina;
+
     private JCheckBox checkboxLog;
+
     private JTextArea textAreaCoin;
+
     private JLabel proxyLabel;
+
     private JTextField inputProxy;
     private JButton proxyTestButton;
 
-    @Override
+
+	@Override
     public @Nls(capitalization = Nls.Capitalization.Title) String getDisplayName() {
         return "Leeks";
     }
@@ -65,21 +70,22 @@ public class SettingsWindow implements Configurable {
         textAreaCoin.setText(value_coin);
         checkbox.setSelected(!value_color);
         checkBoxTableStriped.setSelected(instance.getBoolean("key_table_striped"));
-        checkboxSina.setSelected(instance.getBoolean("key_stocks_sina"));
+		// 默认腾讯财经
+		stockComboBox.setSelectedItem(instance.getValue("key_stock_api","腾讯财经"));
         checkboxLog.setSelected(instance.getBoolean("key_close_log"));
-        cronExpressionFund.setText(instance.getValue("key_cron_expression_fund","0 * * * * ?")); //默认每分钟执行
-        cronExpressionStock.setText(instance.getValue("key_cron_expression_stock","*/10 * * * * ?")); //默认每10秒执行
-        cronExpressionCoin.setText(instance.getValue("key_cron_expression_coin","*/10 * * * * ?")); //默认每10秒执行
+		// 默认每分钟执行
+        cronExpressionFund.setText(instance.getValue("key_cron_expression_fund","0 * * * * ?"));
+		// 默认每10秒执行
+        cronExpressionStock.setText(instance.getValue("key_cron_expression_stock","*/10 * * * * ?"));
+		// 默认每10秒执行
+        cronExpressionCoin.setText(instance.getValue("key_cron_expression_coin","*/10 * * * * ?"));
         //代理设置
         inputProxy.setText(instance.getValue("key_proxy"));
-        proxyTestButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                String proxy = inputProxy.getText().trim();
-                testProxy(proxy);
-            }
-        });
-        return panel1;
+        proxyTestButton.addActionListener(actionEvent -> {
+			String proxy = inputProxy.getText().trim();
+			testProxy(proxy);
+		});
+        return panel;
     }
 
     @Override
@@ -102,20 +108,20 @@ public class SettingsWindow implements Configurable {
         instance.setValue("key_cron_expression_stock", cronExpressionStock.getText());
         instance.setValue("key_cron_expression_coin", cronExpressionCoin.getText());
         instance.setValue("key_table_striped", checkBoxTableStriped.isSelected());
-        instance.setValue("key_stocks_sina",checkboxSina.isSelected());
+		instance.setValue("key_stock_api", String.valueOf(stockComboBox.getSelectedItem()));
         instance.setValue("key_close_log",checkboxLog.isSelected());
         String proxy = inputProxy.getText().trim();
         instance.setValue("key_proxy",proxy);
         HttpClientPool.getHttpClient().buildHttpClient(proxy);
 
-		Project project = CommonDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext(panel1));
+		Project project = CommonDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext(panel));
 		if (project != null) {
 			ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow("leeks");
-			FundWindow fundWindow = FundWindow.getInstance(project);
-			if (fundWindow != null) {
-				fundWindow.apply();
-				fundWindow.getCoinWindow().apply();
-				fundWindow.getCoinWindow().apply();
+			MainTableWindow mainTableWindow = MainTableWindow.getInstance(project);
+			if (mainTableWindow != null) {
+				mainTableWindow.getFundWindow().apply();
+				mainTableWindow.getCoinWindow().apply();
+				mainTableWindow.getStockWindow().apply();
 			}
 		}
 

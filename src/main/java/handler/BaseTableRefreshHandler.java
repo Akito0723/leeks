@@ -1,6 +1,8 @@
 package handler;
 
 import bean.BaseLeeksBean;
+import bean.FundBean;
+import bean.StockBean;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.table.JBTable;
@@ -17,6 +19,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -244,6 +248,44 @@ public abstract class BaseTableRefreshHandler extends DefaultTableModel {
 			bean.setCode(configCode);
 		}
 		return bean;
+	}
+
+	/**
+	 * 处理成本价和持仓
+	 */
+	protected void handlerCostAndBond(BaseLeeksBean bean) {
+		String costPriceStr = bean.getCostPrice();
+		if (StringUtils.isEmpty(costPriceStr)) {
+			return;
+		}
+
+		BigDecimal now;
+		if (bean instanceof StockBean) {
+			now = new BigDecimal(((StockBean) bean).getNow());
+		} else if (bean instanceof FundBean) {
+			now = new BigDecimal(((FundBean) bean).getGsz());
+		} else {
+			return;
+		}
+
+		BigDecimal costPriceDec = new BigDecimal(costPriceStr);
+		BigDecimal incomeDiff = now.add(costPriceDec.negate());
+		if (costPriceDec.compareTo(BigDecimal.ZERO) <= 0) {
+			bean.setIncomePercent("0");
+		} else {
+			BigDecimal incomePercentDec = incomeDiff.divide(costPriceDec, 8, RoundingMode.HALF_UP)
+					.multiply(BigDecimal.TEN)
+					.multiply(BigDecimal.TEN)
+					.setScale(3, RoundingMode.HALF_UP);
+			bean.setIncomePercent(incomePercentDec.toString());
+		}
+		String bondStr = bean.getBonds();
+		if (StringUtils.isNotEmpty(bondStr)) {
+			BigDecimal bondDec = new BigDecimal(bondStr);
+			BigDecimal incomeDec = incomeDiff.multiply(bondDec)
+					.setScale(2, RoundingMode.HALF_UP);
+			bean.setIncome(incomeDec.toString());
+		}
 	}
 
 	public void updateEachLineUI(BaseLeeksBean bean) {

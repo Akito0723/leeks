@@ -8,11 +8,9 @@ import com.intellij.openapi.ui.popup.util.BaseListPopupStep;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.table.JBTable;
 import handler.BaseTableRefreshHandler;
-import handler.coin.CoinRefreshHandler;
 import handler.fund.FundRefreshHandler;
 import handler.stock.StockTableRefreshHandler;
 import lombok.Getter;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +20,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -38,7 +35,7 @@ public class WindowUtils {
 
 	// 股票表头
 	public static final String STOCK_TABLE_HEADER_KEY = "stock_table_header_key2";
-	public static final String STOCK_TABLE_HEADER_VALUE = "编码,股票名称,涨跌,涨跌幅,最高价,最低价,当前价,成本价,持仓,收益率,收益,更新时间";
+	public static final String STOCK_TABLE_HEADER_VALUE = "编码,股票名称,涨跌,涨跌幅,当前价,最高价,最低价,成本价,持仓,收益率,收益,更新时间";
 
 	// 货币表头
 	public static final String COIN_TABLE_HEADER_KEY = "coin_table_header_key2";
@@ -59,7 +56,9 @@ public class WindowUtils {
 		});
 	}
 
-
+	/**
+	 * 表头拖动监听事件
+	 */
 	public static class TableHeadChangeAdapter extends MouseMotionAdapter {
 
 		private final JBTable table;
@@ -88,6 +87,9 @@ public class WindowUtils {
 		}
 	}
 
+	/**
+	 * 行鼠标监听事件
+	 */
 	public static class TableRowMouseAdapter extends MouseAdapter {
 
 		private static final Logger log = Logger.getInstance(TableRowMouseAdapter.class);
@@ -109,17 +111,13 @@ public class WindowUtils {
 			String code = String.valueOf(table.getModel().getValueAt(table.convertRowIndexToModel(table.getSelectedRow()), handler.getCodeColumnIndex()));//FIX 移动列导致的BUG
 			if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() > 1) {
 				// 鼠标左键双击
-				try {
-					if (handler instanceof StockTableRefreshHandler) {
-						// 股票
-						PopupsUiUtil.showImageByStockCode(code, PopupsUiUtil.StockShowType.min, new Point(e.getXOnScreen(), e.getYOnScreen()));
-					}
-					if (handler instanceof FundRefreshHandler) {
-						// 基金
-						PopupsUiUtil.showImageByFundCode(code, PopupsUiUtil.FundShowType.gsz, new Point(e.getXOnScreen(), e.getYOnScreen()));
-					}
-				} catch (MalformedURLException ex) {
-					log.error("showImageByFundCode出现异常,原因:", ex);
+				if (handler instanceof StockTableRefreshHandler) {
+					// 股票
+					PopupsUiUtil.showImageByStockCode(code, PopupsUiUtil.StockShowType.min, new Point(e.getXOnScreen(), e.getYOnScreen()));
+				}
+				if (handler instanceof FundRefreshHandler) {
+					// 基金
+					PopupsUiUtil.showImageByFundCode(code, PopupsUiUtil.FundShowType.gsz, new Point(e.getXOnScreen(), e.getYOnScreen()));
 				}
 			} else if (SwingUtilities.isRightMouseButton(e)) {
 				// 鼠标右键
@@ -141,21 +139,17 @@ public class WindowUtils {
 
 					@Override
 					public @Nullable PopupStep<?> onChosen(PopupsUiUtil.BaseShowType selectedValue, boolean finalChoice) {
-						try {
-							if (handler instanceof StockTableRefreshHandler) {
-								// 股票
-								PopupsUiUtil.showImageByStockCode(code,
-										(PopupsUiUtil.StockShowType) selectedValue,
-										new Point(e.getXOnScreen(), e.getYOnScreen()));
-							}
-							if (handler instanceof FundRefreshHandler) {
-								// 基金
-								PopupsUiUtil.showImageByFundCode(code,
-										(PopupsUiUtil.FundShowType) selectedValue,
-										new Point(e.getXOnScreen(), e.getYOnScreen()));
-							}
-						} catch (MalformedURLException ex) {
-							log.error("showImageByFundCode出现异常,原因:", ex);
+						if (handler instanceof StockTableRefreshHandler) {
+							// 股票
+							PopupsUiUtil.showImageByStockCode(code,
+									(PopupsUiUtil.StockShowType) selectedValue,
+									new Point(e.getXOnScreen(), e.getYOnScreen()));
+						}
+						if (handler instanceof FundRefreshHandler) {
+							// 基金
+							PopupsUiUtil.showImageByFundCode(code,
+									(PopupsUiUtil.FundShowType) selectedValue,
+									new Point(e.getXOnScreen(), e.getYOnScreen()));
 						}
 						return super.onChosen(selectedValue, finalChoice);
 					}
@@ -165,5 +159,4 @@ public class WindowUtils {
 	}
 
 }
-
 

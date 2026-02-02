@@ -1,7 +1,6 @@
 package handler.coin;
 
 import bean.BaseLeeksBean;
-import bean.StockBean;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.table.JBTable;
@@ -17,7 +16,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
-import java.util.Objects;
 import java.util.Vector;
 
 public abstract class CoinRefreshHandler extends BaseTableRefreshHandler {

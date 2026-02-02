@@ -8,12 +8,10 @@ import com.google.gson.Gson;
 import com.intellij.openapi.diagnostic.Logger;
 import handler.coin.CoinRefreshHandler;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import utils.HttpClientPool;
 import utils.LogUtil;
 
 import javax.swing.*;
-import java.util.Date;
 import java.util.function.Consumer;
 
 public class YahooCoinHandler extends CoinRefreshHandler {

@@ -19,6 +19,16 @@ public abstract class BaseLeeksBean {
 	// 持仓
 	protected String bonds;
 
+	/**
+	 * 收益率
+	 */
+	private String incomePercent;
+
+	/**
+	 * 收益
+	 */
+	private String income;
+
 	protected BaseLeeksBean() {}
 
 	public abstract String getValueByColumn(String columnName, boolean colorful);

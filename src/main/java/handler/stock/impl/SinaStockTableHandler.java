@@ -18,6 +18,7 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Deprecated
 public class SinaStockTableHandler extends StockTableRefreshHandler {
 
 	private static final Logger log = Logger.getInstance(SinaStockTableHandler.class);

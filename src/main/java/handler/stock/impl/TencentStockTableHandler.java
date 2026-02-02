@@ -16,6 +16,11 @@ import java.math.RoundingMode;
 import java.util.Date;
 import java.util.function.Consumer;
 
+/**
+ * qt.gtimg.cn 腾讯财经
+ * @author akihiro
+ * @date 2026/02/02.
+ */
 public class TencentStockTableHandler extends StockTableRefreshHandler {
 
 	private static final Logger log = Logger.getInstance(TencentStockTableHandler.class);
@@ -78,30 +83,7 @@ public class TencentStockTableHandler extends StockTableRefreshHandler {
 			bean.setMax(values[33]);//33
 			bean.setMin(values[34]);//34
 
-			BigDecimal now = new BigDecimal(values[3]);
-			String costPriceStr = bean.getCostPrice();
-			// 处理成本价和持仓
-			if (StringUtils.isNotEmpty(costPriceStr)) {
-				BigDecimal costPriceDec = new BigDecimal(costPriceStr);
-				BigDecimal incomeDiff = now.add(costPriceDec.negate());
-				if (costPriceDec.compareTo(BigDecimal.ZERO) <= 0) {
-					bean.setIncomePercent("0");
-				} else {
-					BigDecimal incomePercentDec = incomeDiff.divide(costPriceDec, 5, RoundingMode.HALF_UP)
-							.multiply(BigDecimal.TEN)
-							.multiply(BigDecimal.TEN)
-							.setScale(3, RoundingMode.HALF_UP);
-					bean.setIncomePercent(incomePercentDec.toString());
-				}
-
-				String bondStr = bean.getBonds();
-				if (StringUtils.isNotEmpty(bondStr)) {
-					BigDecimal bondDec = new BigDecimal(bondStr);
-					BigDecimal incomeDec = incomeDiff.multiply(bondDec)
-							.setScale(2, RoundingMode.HALF_UP);
-					bean.setIncome(incomeDec.toString());
-				}
-			}
+			super.handlerCostAndBond(bean);
 			// 处理完成一个更新一行
 			updateEachLineUI.accept(bean);
 		} catch (Exception e) {

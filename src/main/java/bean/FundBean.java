@@ -3,13 +3,10 @@ package bean;
 import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 import utils.PinYinUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
-import java.util.Objects;
 
 @Getter
 @Setter
@@ -45,17 +42,6 @@ public class FundBean extends BaseLeeksBean {
 	 * gztime估值时间
 	 */
     private String gztime;
-
-	/**
-	 * 收益率
-	 */
-    private String incomePercent;
-
-	/**
-	 * 收益
-	 */
-    private String income;
-
 
     /**
      * 返回列名的VALUE 用作展示

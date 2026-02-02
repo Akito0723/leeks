@@ -5,12 +5,8 @@ import com.intellij.notification.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.IdeFrame;
 import com.intellij.openapi.wm.WindowManager;
-import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
-import java.util.ArrayList;
-
-import javax.swing.*;
 
 public class LogUtil {
 

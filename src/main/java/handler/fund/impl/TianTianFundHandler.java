@@ -13,7 +13,6 @@ import utils.LogUtil;
 import javax.swing.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -110,29 +109,7 @@ public class TianTianFundHandler extends FundRefreshHandler {
             bean.setGszzl(fundBean.getGszzl());
             bean.setGztime(fundBean.getGztime());
 
-            BigDecimal now = new BigDecimal(bean.getGsz());
-            String costPriceStr = bean.getCostPrice();
-            if (StringUtils.isNotEmpty(costPriceStr)) {
-                BigDecimal costPriceDec = new BigDecimal(costPriceStr);
-                BigDecimal incomeDiff = now.add(costPriceDec.negate());
-                if (costPriceDec.compareTo(BigDecimal.ZERO) <= 0) {
-                    bean.setIncomePercent("0");
-                } else {
-                    BigDecimal incomePercentDec = incomeDiff.divide(costPriceDec, 8, RoundingMode.HALF_UP)
-                            .multiply(BigDecimal.TEN)
-                            .multiply(BigDecimal.TEN)
-                            .setScale(3, RoundingMode.HALF_UP);
-                    bean.setIncomePercent(incomePercentDec.toString());
-                }
-
-                String bondStr = bean.getBonds();
-                if (StringUtils.isNotEmpty(bondStr)) {
-                    BigDecimal bondDec = new BigDecimal(bondStr);
-                    BigDecimal incomeDec = incomeDiff.multiply(bondDec)
-                            .setScale(2, RoundingMode.HALF_UP);
-                    bean.setIncome(incomeDec.toString());
-                }
-            }
+			handlerCostAndBond(bean);
             updateEachLineUI.accept(bean);
         } catch (Exception e) {
             log.error("解析基金数据失败,原因:", e);

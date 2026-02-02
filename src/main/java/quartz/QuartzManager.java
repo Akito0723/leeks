@@ -21,7 +21,7 @@ public class QuartzManager {
 
 	private Scheduler sched = null;
 
-    private String instanceName;
+    private final String instanceName;
 
     private QuartzManager(Scheduler sched, String instanceName) {
         this.sched = sched;

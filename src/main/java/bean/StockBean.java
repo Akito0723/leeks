@@ -1,10 +1,8 @@
 package bean;
 
-import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import utils.PinYinUtils;
 
 import java.util.Date;
@@ -39,17 +37,6 @@ public class StockBean extends BaseLeeksBean{
      * 最低价
      */
     private String min;
-
-	/**
-	 * 收益率
-	 */
-    private String incomePercent;
-
-	/**
-	 * 收益
-	 */
-	private String income;
-
 
     /**
      * 返回列名的VALUE 用作展示
@@ -93,7 +80,7 @@ public class StockBean extends BaseLeeksBean{
             case "更新时间":
                 String timeStr = "--";
                 if (this.getTime() != null) {
-					timeStr = DateFormatUtils.format(this.getTime(), "MM-dd HH:mm:ss");
+					timeStr = DateFormatUtils.format(this.getTime(), "HH:mm:ss");
                 }
                 return timeStr;
             default:
