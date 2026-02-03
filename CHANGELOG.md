@@ -18,6 +18,7 @@
 - [x] 增加 `eastmoney.com` 东方财富 数据源
 - [x] 优化 K线/分时图片弹窗,异步加载图片
 - [x] 优化 日志与异常记录
+- [x] 表格条纹(斑马线) 功能修复
 
 
 [3.0.1]: https://github.com/JetBrains/gradle-changelog-plugin/releases/tag/v3.0.1
