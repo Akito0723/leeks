@@ -119,7 +119,7 @@ public abstract class BaseLeeksWindow {
 			return;
 		}
 		PropertiesComponent instance = PropertiesComponent.getInstance();
-		baseTableRefreshHandler.refreshColorful(instance.getBoolean("key_colorful"));
+		baseTableRefreshHandler.setColorful(instance.getBoolean("key_colorful"));
 		List<String> codes = this.loadCodeConfig();
 		if (CollectionUtils.isEmpty(codes)) {
 			// 如果没有数据则不需要启动时钟任务浪费资源

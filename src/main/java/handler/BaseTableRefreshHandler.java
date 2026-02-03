@@ -3,6 +3,7 @@ package handler;
 import bean.BaseLeeksBean;
 import bean.FundBean;
 import bean.StockBean;
+import com.google.common.collect.Lists;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.ui.JBColor;
@@ -44,7 +45,7 @@ public abstract class BaseTableRefreshHandler extends DefaultTableModel {
 	 * key: 中文表头
 	 * value: 表头所在下标
 	 */
-	protected final Map<String, Integer> columnMaps = new Hashtable<>();
+	protected final Map<String, Integer> columnMaps = new LinkedHashMap<>();
 
 	/**
 	 * key: 编码
@@ -64,10 +65,13 @@ public abstract class BaseTableRefreshHandler extends DefaultTableModel {
 
 	/**
 	 *  是否彩色模式
-	 *  默认 true
 	 */
-	@Setter
-	protected boolean colorful = true;
+	protected Boolean colorful;
+
+	/**
+	 *  是否开启表格条纹（斑马线）
+	 */
+	protected Boolean striped;
 
 	/**
 	 * 表头 在 com.intellij.ide.util.PropertiesComponent 的 key
@@ -110,7 +114,7 @@ public abstract class BaseTableRefreshHandler extends DefaultTableModel {
 		}
 		String[] columns = StringUtils.split(tableHeaderValue, ",");
 		for (int i = 0; i < columns.length; i++) {
-			// 如果是非色彩模式,PropertiesComponent拿出来的就columns[i]是拼音,处理下
+			// 如果是非色彩模式,PropertiesComponent拿出来的就columns[i]可能是拼音,处理下
 			String columnName = WindowUtils.getColumnPinYinMap().getOrDefault(columns[i], columns[i]);
 			columnMaps.put(columnName, i);
 			if (StringUtils.equals(columnName, "编码")) {
@@ -128,21 +132,14 @@ public abstract class BaseTableRefreshHandler extends DefaultTableModel {
 		FontMetrics metrics = table.getFontMetrics(table.getFont());
 		table.setRowHeight(Math.max(table.getRowHeight(), metrics.getHeight()));
 		table.setModel(this);
-		refreshColorful(!colorful);
-	}
 
-	/**
-	 * 刷新颜色模式
-	 * @param colorful true: 彩色模式 false: 隐蔽模式
-	 */
-	public void refreshColorful(boolean colorful) {
-		if (this.colorful == colorful) {
-			return;
-		}
-		this.colorful = colorful;
+		PropertiesComponent instance = PropertiesComponent.getInstance();
+		this.colorful = instance.getBoolean("key_colorful");
+		this.striped = instance.getBoolean("key_table_striped");
+
 		// 刷新表头
 		String[] columns = columnMaps.keySet().toArray(new String[0]);
-		if (colorful) {
+		if (colorful != null && colorful) {
 			setColumnIdentifiers(columns);
 		} else {
 			// 非彩色模式,把对应的表头转拼音
@@ -161,51 +158,74 @@ public abstract class BaseTableRefreshHandler extends DefaultTableModel {
 				.forEach(index -> rowSorter.setComparator(index, doubleComparator));
 		table.setRowSorter(rowSorter);
 
-		// 处理 红涨绿跌
-		Arrays.stream(new String[]{"涨跌", "涨跌幅", "收益率", "收益",})
-				.map(columnMaps::get)
-				.filter(index -> index != null && index >= 0)
-				.forEach(index -> {
-					table.getColumn(getColumnName(index)).setCellRenderer(new DefaultTableCellRenderer() {
-						@Override
-						public Component getTableCellRendererComponent(JTable table, Object value,
-								boolean isSelected, boolean hasFocus, int row, int column) {
-							// 红张绿跌
-							double temp = NumberUtils.toDouble(StringUtils.remove(Objects.toString(value), "%"));
-							if (temp > 0) {
-								if (colorful) {
-									setForeground(JBColor.RED);
-								} else {
-									setForeground(JBColor.DARK_GRAY);
-								}
-							} else if (temp < 0) {
-								if (colorful) {
-									setForeground(JBColor.GREEN);
-								} else {
-									setForeground(JBColor.GRAY);
-								}
-							} else {
-								Color origin = getForeground();
-								setForeground(origin);
-							}
-							return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-						}
-					});
-				});
+		if (table instanceof JBTable) {
+			((JBTable) table).setStriped(false);
+		}
+		table.setShowGrid(false);
+		table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+			@Override
+			public Component getTableCellRendererComponent(
+					JTable table, Object value, boolean isSelected,
+					boolean hasFocus, int row, int column) {
+				Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+				// 表格条纹
+				if (!isSelected && striped != null && striped) {
+					setBackground(row % 2 == 0 ? JBColor.background(): JBColor.LIGHT_GRAY);
+				}
+
+				boolean b = Lists.newArrayList("涨跌", "涨跌幅", "收益率", "收益").contains(getColumnName(column));
+				if (!b) {
+					setForeground(JBColor.foreground());
+					return c;
+				}
+				// 红张绿跌
+				double temp = NumberUtils.toDouble(StringUtils.remove(Objects.toString(value), "%"));
+				if (temp > 0) {
+					if (colorful != null && colorful) {
+						setForeground(JBColor.RED);
+					} else {
+						setForeground(JBColor.DARK_GRAY);
+					}
+				} else if (temp < 0) {
+					if (colorful != null && colorful) {
+						setForeground(JBColor.GREEN);
+					} else {
+						setForeground(JBColor.GRAY);
+					}
+				} else {
+					Color origin = getForeground();
+					setForeground(origin);
+				}
+				return c;
+			}
+		});
 	}
 
+	/**
+	 * 刷新颜色模式
+	 * @param colorful true: 彩色模式 false: 隐蔽模式
+	 */
+	public void setColorful(boolean colorful) {
+		if (this.colorful != null && this.colorful == colorful) {
+			return;
+		}
+		this.colorful = colorful;
+		table.repaint();
+	}
 
 	/**
 	 * 设置表格条纹（斑马线）
-	 *
 	 * @param striped true: 设置条纹
-	 * @throws RuntimeException 如果table不是{@link JBTable}类型，请自行实现setStriped
 	 */
 	public void setStriped(boolean striped) {
 		if (!(table instanceof JBTable)) {
 			log.warn("this.table不是 JBTable 类型，请自行实现setStriped");
+			return;
 		}
-		((JBTable) table).setStriped(striped);
+		if (this.striped != null && this.striped == striped) {
+			return;
+		}
+		this.striped = striped;
 		table.repaint();
 	}
 
