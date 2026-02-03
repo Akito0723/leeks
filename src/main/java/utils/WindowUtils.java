@@ -131,7 +131,7 @@ public class WindowUtils {
 					values = PopupsUiUtil.FundShowType.values();
 				}
 
-				JBPopupFactory.getInstance().createListPopup(new BaseListPopupStep<PopupsUiUtil.BaseShowType>("", values) {
+				JBPopupFactory.getInstance().createListPopup(new BaseListPopupStep<>("", values) {
 					@Override
 					public @NotNull String getTextFor(PopupsUiUtil.BaseShowType showType) {
 						return showType.getDesc();
@@ -141,14 +141,12 @@ public class WindowUtils {
 					public @Nullable PopupStep<?> onChosen(PopupsUiUtil.BaseShowType selectedValue, boolean finalChoice) {
 						if (handler instanceof StockTableRefreshHandler) {
 							// 股票
-							PopupsUiUtil.showImageByStockCode(code,
-									(PopupsUiUtil.StockShowType) selectedValue,
+							PopupsUiUtil.showImageByStockCode(code, (PopupsUiUtil.StockShowType) selectedValue,
 									new Point(e.getXOnScreen(), e.getYOnScreen()));
 						}
 						if (handler instanceof FundRefreshHandler) {
 							// 基金
-							PopupsUiUtil.showImageByFundCode(code,
-									(PopupsUiUtil.FundShowType) selectedValue,
+							PopupsUiUtil.showImageByFundCode(code, (PopupsUiUtil.FundShowType) selectedValue,
 									new Point(e.getXOnScreen(), e.getYOnScreen()));
 						}
 						return super.onChosen(selectedValue, finalChoice);

@@ -3,7 +3,6 @@ import handler.BaseTableRefreshHandler;
 import handler.fund.impl.TianTianFundHandler;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.swing.*;
 import java.util.List;
 
 /**

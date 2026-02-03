@@ -3,20 +3,16 @@ package handler.stock.impl;
 import bean.BaseLeeksBean;
 import bean.EastMoneyResponse;
 import bean.StockBean;
-import bean.YahooResponse;
 import com.google.gson.Gson;
 import com.intellij.openapi.diagnostic.Logger;
 import handler.stock.StockTableRefreshHandler;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import utils.HttpClientPool;
 import utils.LogUtil;
 
 import javax.swing.*;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +34,7 @@ public class EastMoneyTableHandler extends StockTableRefreshHandler {
 	 * key: 东财code: 1.000001, 0.399001
 	 * value: sh000001,sz399001
 	 */
-	private Map<String, String> eastMoneyCodeMap = new HashMap<>();
+	private final Map<String, String> eastMoneyCodeMap = new HashMap<>();
 
 	public EastMoneyTableHandler(JTable table, JLabel refreshTimeLabel) {
 		super(table, refreshTimeLabel);

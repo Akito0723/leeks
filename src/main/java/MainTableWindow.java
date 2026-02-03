@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import utils.*;
 
-import javax.swing.*;
 import java.util.*;
 
 public class MainTableWindow implements ToolWindowFactory {

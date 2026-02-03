@@ -1,13 +1,10 @@
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.openapi.actionSystem.*;
 import handler.BaseTableRefreshHandler;
 import handler.stock.impl.EastMoneyTableHandler;
 import handler.stock.impl.TencentStockTableHandler;
 import org.apache.commons.lang3.StringUtils;
 import utils.WindowUtils;
 
-import javax.swing.*;
-import java.awt.*;
 import java.util.List;
 
 public class StockWindow extends BaseLeeksWindow {

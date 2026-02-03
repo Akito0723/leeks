@@ -1,13 +1,9 @@
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.openapi.actionSystem.*;
 import handler.BaseTableRefreshHandler;
 import handler.coin.impl.YahooCoinHandler;
 import org.apache.commons.lang3.StringUtils;
 import utils.WindowUtils;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.*;
 import java.util.List;
 
 public class CoinWindow extends BaseLeeksWindow {

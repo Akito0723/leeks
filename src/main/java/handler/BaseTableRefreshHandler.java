@@ -40,7 +40,7 @@ public abstract class BaseTableRefreshHandler extends DefaultTableModel {
 	 * key: 中文表头
 	 * value: 表头所在下标
 	 */
-	protected Map<String, Integer> columnMaps = new Hashtable<>();
+	protected final Map<String, Integer> columnMaps = new Hashtable<>();
 
 	/**
 	 * key: 编码
@@ -347,12 +347,9 @@ public abstract class BaseTableRefreshHandler extends DefaultTableModel {
 	}
 
 	public void updateRefreshTimeLabelUI(String text) {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				refreshTimeLabel.setText(text);
-				refreshTimeLabel.setToolTipText("最后刷新时间");
-			}
+		SwingUtilities.invokeLater(() -> {
+			refreshTimeLabel.setText(text);
+			refreshTimeLabel.setToolTipText("最后刷新时间");
 		});
 	}
 
