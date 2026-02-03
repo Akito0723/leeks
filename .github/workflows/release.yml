@@ -56,4 +56,8 @@ jobs:
         with:
           tag_name: v${{ steps.version.outputs.version }}
           name: v${{ steps.version.outputs.version }}
+          body: |
+            Automated release from GitHub Actions.
+            Release: 🌟v${{ steps.version.outputs.version }}
+            sha: ${{ github.sha }}
           files: ${{ steps.package.outputs.zip_path }}
