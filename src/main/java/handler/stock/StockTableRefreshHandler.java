@@ -16,7 +16,7 @@ public abstract class StockTableRefreshHandler extends BaseTableRefreshHandler {
 
 	@Override
 	public String getTableHeaderValue() {
-		return  WindowUtils.STOCK_TABLE_HEADER_VALUE;
+		return WindowUtils.STOCK_TABLE_HEADER_VALUE;
 	}
 
 	@Override

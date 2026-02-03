@@ -4,8 +4,10 @@ import bean.BaseLeeksBean;
 import bean.FundBean;
 import bean.StockBean;
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.table.JBTable;
+import handler.stock.impl.EastMoneyTableHandler;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -33,6 +35,8 @@ import java.util.function.Consumer;
  * @date 2026/01/28.
  */
 public abstract class BaseTableRefreshHandler extends DefaultTableModel {
+
+	private static final Logger log = Logger.getInstance(BaseTableRefreshHandler.class);
 
 	private final static DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
@@ -198,11 +202,11 @@ public abstract class BaseTableRefreshHandler extends DefaultTableModel {
 	 * @throws RuntimeException 如果table不是{@link JBTable}类型，请自行实现setStriped
 	 */
 	public void setStriped(boolean striped) {
-		if (table instanceof JBTable) {
-			((JBTable) table).setStriped(striped);
-		} else {
-			throw new RuntimeException("table不是 JBTable 类型，请自行实现setStriped");
+		if (!(table instanceof JBTable)) {
+			log.warn("this.table不是 JBTable 类型，请自行实现setStriped");
 		}
+		((JBTable) table).setStriped(striped);
+		table.repaint();
 	}
 
 	/**
@@ -236,12 +240,12 @@ public abstract class BaseTableRefreshHandler extends DefaultTableModel {
 		if (configCode.contains(",")) {
 			// configCode包含,号说明有成本价和持仓
 			String[] arr = configCode.split(",");
-			bean.setCode(configCode);
+			bean.setCode(arr[0]);
 			if (arr.length > 1) {
 				bean.setCostPrice(arr[1]);
 			}
 			if (arr.length > 2) {
-				bean.setCostPrice(arr[2]);
+				bean.setBonds(arr[2]);
 			}
 		} else {
 			// 直接是编码
