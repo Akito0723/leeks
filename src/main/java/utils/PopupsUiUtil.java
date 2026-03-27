@@ -20,34 +20,28 @@ import java.net.URI;
 public class PopupsUiUtil {
 
 	private static final String loading_text = "加载中...";
+	private static final String IMAGE_URL_KEY = "imageUrl";
+	private static final Dimension IMAGE_PLACEHOLDER_SIZE = new Dimension(560, 360);
 
 	private static final Object BALLOON_LOCK = new Object();
-	private static final JPanel BALLOON_CONTENT = new JPanel(new BorderLayout());
 	private static Balloon balloonInstance;
 
-	private static Balloon getBalloonInstance() {
-		synchronized (BALLOON_LOCK) {
-			if (balloonInstance == null || balloonInstance.isDisposed()) {
-				balloonInstance = JBPopupFactory.getInstance()
-						.createBalloonBuilder(BALLOON_CONTENT)
-						.setBorderInsets(new Insets(0, 0, 0, 0))
-						.setHideOnClickOutside(true)
-						.createBalloon();
-			}
-			return balloonInstance;
-		}
+	private static Balloon createBalloon(JComponent content) {
+		return JBPopupFactory.getInstance()
+				.createBalloonBuilder(content)
+				.setBorderInsets(new Insets(0, 0, 0, 0))
+				.setHideOnClickOutside(true)
+				.createBalloon();
 	}
 
-	private static Balloon prepareBalloonContent(JComponent content) {
-		Balloon balloon = getBalloonInstance();
-		if (!balloon.isDisposed()) {
-			balloon.hide();
+	private static Balloon prepareBalloon(JComponent content) {
+		synchronized (BALLOON_LOCK) {
+			if (balloonInstance != null && !balloonInstance.isDisposed()) {
+				balloonInstance.hide();
+			}
+			balloonInstance = createBalloon(content);
+			return balloonInstance;
 		}
-		BALLOON_CONTENT.removeAll();
-		BALLOON_CONTENT.add(content, BorderLayout.CENTER);
-		BALLOON_CONTENT.revalidate();
-		BALLOON_CONTENT.repaint();
-		return balloon;
 	}
 	/**
      * 弹窗展示图片
@@ -64,11 +58,13 @@ public class PopupsUiUtil {
 
 		// 使用占位Label（先不加载图片）
 		JLabel imageLabel = new JLabel(loading_text, SwingConstants.CENTER);
+		imageLabel.setPreferredSize(IMAGE_PLACEHOLDER_SIZE);
+		imageLabel.setMinimumSize(IMAGE_PLACEHOLDER_SIZE);
 
 		JBTabbedPane tabs = new JBTabbedPane();
 		tabs.addTab(type.getDesc(), imageLabel);
 
-		Balloon balloon = prepareBalloonContent(tabs);
+		Balloon balloon = prepareBalloon(tabs);
 
 		balloon.show(RelativePoint.fromScreen(showByPoint), Balloon.Position.atRight);
 
@@ -100,13 +96,16 @@ public class PopupsUiUtil {
 		JBTabbedPane tabs = new JBTabbedPane();
 
 		// 创建 Balloon 弹窗
-		Balloon balloon = prepareBalloonContent(tabs);
+		Balloon balloon = prepareBalloon(tabs);
 
 		for (StockShowType type : StockShowType.values()) {
 			String imageUrlByStock = getImageUrlByStock(stockCode, type);
 
 			// 占位 Label
 			JLabel imageLabel = new JLabel(loading_text, SwingConstants.CENTER);
+			imageLabel.setPreferredSize(IMAGE_PLACEHOLDER_SIZE);
+			imageLabel.setMinimumSize(IMAGE_PLACEHOLDER_SIZE);
+			imageLabel.putClientProperty(IMAGE_URL_KEY, imageUrlByStock);
 
 			tabs.addTab(type.getDesc(), imageLabel);
 
@@ -121,10 +120,9 @@ public class PopupsUiUtil {
 		tabs.addChangeListener(e -> {
 			Component selected = tabs.getSelectedComponent();
 			if (selected instanceof JLabel label) {
-				if (label.getIcon() == null &&
-						StringUtils.isNotBlank(label.getText()) &&
-						!StringUtils.equals(label.getText(), loading_text)) {
-					loadImageAsync(label, tabs, balloon, label.getText(), project);
+				String imageUrl = (String) label.getClientProperty(IMAGE_URL_KEY);
+				if (label.getIcon() == null && StringUtils.isNotBlank(imageUrl)) {
+					loadImageAsync(label, tabs, balloon, imageUrl, project);
 				}
 			}
 		});
@@ -141,7 +139,7 @@ public class PopupsUiUtil {
 	 */
 	private static String getImageUrlByStock(String stockCode, StockShowType type) {
 		String prefix = StringUtils.substring(stockCode, 0, 2);
-		String url = "http://image.sinajs.cn/newchart/";
+		String url = "http://image.sinajs.cn/newchart";
 		switch (prefix) {
 			case "sh":
 			case "sz":
@@ -200,23 +198,35 @@ public class PopupsUiUtil {
 				Image img = icon.getImage();
 				int w = img.getWidth(null);
 				int h = img.getHeight(null);
+				if (w == -1) {
+					SwingUtilities.invokeLater(() -> {
+						if (!project.isDisposed() && !balloon.isDisposed()) {
+							label.setText("图片加载失败");
+						}
+					});
+				} else {
+					SwingUtilities.invokeLater(() -> {
+						if (!project.isDisposed() && !balloon.isDisposed()) {
+							label.setText(null);
+							label.setIcon(icon);
+							// 设置 JLabel 尺寸等于图片原始大小
+							label.setPreferredSize(new Dimension(w, h));
+							label.setSize(new Dimension(w, h));
+							// 刷新大小
+							label.revalidate();
+							label.repaint();
+							tabs.revalidate();
+							tabs.repaint();
+							balloon.revalidate();
+						}
+					});
+				}
+			} catch (Exception e) {
 				SwingUtilities.invokeLater(() -> {
-					if (!project.isDisposed()) {
-						label.setText(null);
-						label.setIcon(icon);
-						// 设置 JLabel 尺寸等于图片原始大小
-						label.setPreferredSize(new Dimension(w, h));
-						label.setSize(new Dimension(w, h));
-						// 刷新大小
-						label.revalidate();
-						label.repaint();
-						tabs.revalidate();
-						tabs.repaint();
-						balloon.revalidate();
+					if (!project.isDisposed() && !balloon.isDisposed()) {
+						label.setText("图片加载失败");
 					}
 				});
-			} catch (Exception e) {
-				SwingUtilities.invokeLater(() -> label.setText("图片加载失败"));
 			}
 		});
 	}

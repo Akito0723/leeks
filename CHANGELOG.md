@@ -22,3 +22,11 @@
 
 
 [3.0.1]: https://github.com/JetBrains/gradle-changelog-plugin/releases/tag/v3.0.1
+
+## [3.0.2]
+- [x] 继续优化 K线/分时图片弹窗
+- [x] 将 `HttpClientPool` 底层实现切换为 JDK `java.net.http.HttpClient`
+
+
+[3.0.2]: https://github.com/JetBrains/gradle-changelog-plugin/releases/tag/v3.0.2
+
