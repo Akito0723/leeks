@@ -73,7 +73,7 @@ public class HttpClientPool {
 
     private String getResponseContent(String url, HttpRequest request) throws HttpRequestException {
         try {
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             int statusCode = response.statusCode();
             if (statusCode < 200 || statusCode >= 300) {
                 throw new HttpStatusException(url, statusCode, response.body());
