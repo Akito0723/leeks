@@ -29,3 +29,15 @@
 
 
 [3.0.2]: https://github.com/JetBrains/gradle-changelog-plugin/releases/tag/v3.0.2
+
+## [3.0.3]
+- [x] 修复基金估值图弹窗无法触发、右键可能选择错误数据行的问题
+- [x] 优化 K线/分时图片加载，增加请求超时并避免重复下载
+- [x] 使用 `HttpClientManager` 统一管理代理请求与直连图片请求
+- [x] 修复 Cron 表达式校验、代理测试和设置修改状态判断
+- [x] 优化基金、股票和虚拟币配置解析，兼容单条持仓与旧版代码列表
+- [x] 将代理测试和行情刷新移出 EDT，减少设置操作造成的界面卡顿
+- [x] 更新插件图标
+
+
+[3.0.3]: https://github.com/JetBrains/gradle-changelog-plugin/releases/tag/v3.0.3
