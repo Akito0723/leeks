@@ -148,6 +148,10 @@ public class SettingsWindow implements Configurable {
 
     public static List<String> getConfigList(String key, String split) {
         String value = PropertiesComponent.getInstance().getValue(key);
+        return splitConfigValue(value, split);
+    }
+
+    private static List<String> splitConfigValue(String value, String split) {
         if (StringUtils.isEmpty(value)) {
             return new ArrayList<>();
         }
@@ -188,20 +192,20 @@ public class SettingsWindow implements Configurable {
      */
     private String checkConfig() {
         StringBuilder errorMsg = new StringBuilder();
-        errorMsg.append(getConfigList(cronExpressionFund.getText(), ";").stream().map(s -> {
+        errorMsg.append(splitConfigValue(cronExpressionFund.getText(), ";").stream().map(s -> {
             if (QuartzManager.checkCronExpression(s)) {
 				return "";
             } else {
 				return "Fund请配置正确的cron表达式[" + s + "]、";
             }
-        }).collect(Collectors.joining())); errorMsg.append(getConfigList(cronExpressionStock.getText(), ";").stream().map(s -> {
+        }).collect(Collectors.joining())); errorMsg.append(splitConfigValue(cronExpressionStock.getText(), ";").stream().map(s -> {
             if (QuartzManager.checkCronExpression(s)) {
 				return "";
             } else {
 				return "Stock请配置正确的cron表达式[" + s + "]、";
             }
         }).collect(Collectors.joining()));
-        errorMsg.append(getConfigList(cronExpressionCoin.getText(), ";").stream().map(s -> {
+        errorMsg.append(splitConfigValue(cronExpressionCoin.getText(), ";").stream().map(s -> {
             if (QuartzManager.checkCronExpression(s)) {
 				return "";
             } else {
