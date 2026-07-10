@@ -319,6 +319,10 @@ public abstract class BaseTableRefreshHandler extends DefaultTableModel {
 		if (bean.getCode() == null) {
 			return;
 		}
+		if (!SwingUtilities.isEventDispatchThread()) {
+			SwingUtilities.invokeLater(() -> updateEachLineUI(bean));
+			return;
+		}
 		Vector<Object> convertData = new Vector<>(columnMaps.size());
 		for (String columnName : columnMaps.keySet()) {
 			convertData.addElement(bean.getValueByColumn(columnName, colorful));

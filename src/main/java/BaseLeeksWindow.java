@@ -1,6 +1,7 @@
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.table.JBTable;
 import handler.BaseTableRefreshHandler;
@@ -15,6 +16,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  *
@@ -36,6 +38,8 @@ public abstract class BaseLeeksWindow {
 	private boolean stop_action_enabled = true;
 
 	protected BaseTableRefreshHandler baseTableRefreshHandler;
+
+	private final AtomicLong refreshVersion = new AtomicLong();
 
 	protected abstract BaseTableRefreshHandler factoryHandler();
 
@@ -103,6 +107,10 @@ public abstract class BaseLeeksWindow {
 	}
 
 	public void apply() {
+		if (!SwingUtilities.isEventDispatchThread()) {
+			ApplicationManager.getApplication().invokeLater(this::apply);
+			return;
+		}
 		if (baseTableRefreshHandler == null) {
 			return;
 		}
@@ -115,6 +123,10 @@ public abstract class BaseLeeksWindow {
 	}
 
 	public void refresh() {
+		if (!SwingUtilities.isEventDispatchThread()) {
+			ApplicationManager.getApplication().invokeLater(this::refresh);
+			return;
+		}
 		if (baseTableRefreshHandler == null) {
 			return;
 		}
@@ -125,17 +137,25 @@ public abstract class BaseLeeksWindow {
 			// 如果没有数据则不需要启动时钟任务浪费资源
 			stop();
 		} else {
-			baseTableRefreshHandler.refreshTableUIData(codes);
-			QuartzManager quartzManager = QuartzManager.getInstance(getName());
-			HashMap<String, Object> dataMap = new HashMap<>();
-			dataMap.put(HandlerJob.KEY_HANDLER, baseTableRefreshHandler);
-			dataMap.put(HandlerJob.KEY_CODES, codes);
-			String cronExpression = getCronExpression();
-			quartzManager.runJob(HandlerJob.class, cronExpression, dataMap);
+			long currentRefreshVersion = refreshVersion.incrementAndGet();
+			BaseTableRefreshHandler handler = baseTableRefreshHandler;
+			ApplicationManager.getApplication().executeOnPooledThread(() -> {
+				handler.refreshTableUIData(codes);
+				if (refreshVersion.get() != currentRefreshVersion) {
+					return;
+				}
+				QuartzManager quartzManager = QuartzManager.getInstance(getName());
+				HashMap<String, Object> dataMap = new HashMap<>();
+				dataMap.put(HandlerJob.KEY_HANDLER, handler);
+				dataMap.put(HandlerJob.KEY_CODES, codes);
+				String cronExpression = getCronExpression();
+				quartzManager.runJob(HandlerJob.class, cronExpression, dataMap);
+			});
 		}
 	}
 
 	public void stop() {
+		refreshVersion.incrementAndGet();
 		QuartzManager.getInstance(getName()).stopJob();
 		if (baseTableRefreshHandler != null) {
 			baseTableRefreshHandler.stopHandle();

@@ -1,6 +1,7 @@
 import com.intellij.ide.DataManager;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
@@ -136,15 +137,29 @@ public class SettingsWindow implements Configurable {
 			LogUtil.notifyWarn("请输入代理地址");
 			return;
 		}
-		HttpClientManager httpClientManager = HttpClientManager.getInstance();
 		try {
 			HttpClientManager.validateProxy(proxy);
-			httpClientManager.getWithProxy("https://www.baidu.com", proxy);
-			LogUtil.notifyInfo("代理测试成功!请保存");
-		} catch (Exception e) {
-			log.error("代理测试异常,原因:", e);
-			LogUtil.notifyInfo("测试代理异常!");
+		} catch (IllegalArgumentException e) {
+			LogUtil.notifyWarn(e.getMessage());
+			return;
 		}
+
+		proxyTestButton.setEnabled(false);
+		ApplicationManager.getApplication().executeOnPooledThread(() -> {
+			try {
+				HttpClientManager.getInstance().getWithProxy("https://www.baidu.com", proxy);
+				SwingUtilities.invokeLater(() -> {
+					proxyTestButton.setEnabled(true);
+					LogUtil.notifyInfo("代理测试成功!请保存");
+				});
+			} catch (Exception e) {
+				log.error("代理测试异常,原因:", e);
+				SwingUtilities.invokeLater(() -> {
+					proxyTestButton.setEnabled(true);
+					LogUtil.notifyWarn("测试代理异常!");
+				});
+			}
+		});
 	}
 
     public static List<String> getConfigList(String key, String split) {
