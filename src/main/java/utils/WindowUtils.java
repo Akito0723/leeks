@@ -106,10 +106,18 @@ public class WindowUtils {
 
 		@Override
 		public void mousePressed(MouseEvent e) {
-			if (table.getSelectedRow() < 0)
+			boolean isLeftDoubleClick = SwingUtilities.isLeftMouseButton(e) && e.getClickCount() > 1;
+			boolean isRightClick = SwingUtilities.isRightMouseButton(e);
+			if (!isLeftDoubleClick && !isRightClick) {
 				return;
-			String code = String.valueOf(table.getModel().getValueAt(table.convertRowIndexToModel(table.getSelectedRow()), handler.getCodeColumnIndex()));//FIX 移动列导致的BUG
-			if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() > 1) {
+			}
+			int selectedRow = table.rowAtPoint(e.getPoint());
+			if (selectedRow < 0) {
+				return;
+			}
+			table.setRowSelectionInterval(selectedRow, selectedRow);
+			String code = String.valueOf(table.getModel().getValueAt(table.convertRowIndexToModel(selectedRow), handler.getCodeColumnIndex()));//FIX 移动列导致的BUG
+			if (isLeftDoubleClick) {
 				// 鼠标左键双击
 				if (handler instanceof StockTableRefreshHandler) {
 					// 股票
@@ -119,7 +127,7 @@ public class WindowUtils {
 					// 基金
 					PopupsUiUtil.showImageByFundCode(code, PopupsUiUtil.FundShowType.gsz, new Point(e.getXOnScreen(), e.getYOnScreen()));
 				}
-			} else if (SwingUtilities.isRightMouseButton(e)) {
+			} else {
 				// 鼠标右键
 				PopupsUiUtil.BaseShowType[] values = new PopupsUiUtil.BaseShowType[0];
 				if (handler instanceof StockTableRefreshHandler) {
@@ -157,4 +165,3 @@ public class WindowUtils {
 	}
 
 }
-
