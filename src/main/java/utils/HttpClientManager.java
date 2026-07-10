@@ -57,13 +57,38 @@ public class HttpClientManager {
 
     private static HttpClient buildProxyClient(String proxyStr) {
         HttpClient.Builder httpClientBuilder = newClientBuilder();
-        String[] proxyParts = StringUtils.split(proxyStr, ':');
-        if (proxyParts.length == 2) {
-            String host = proxyParts[0];
-            int port = Integer.parseInt(proxyParts[1]);
-            httpClientBuilder.proxy(ProxySelector.of(new InetSocketAddress(host, port)));
-        }
+        InetSocketAddress proxyAddress = parseProxyAddress(proxyStr);
+        httpClientBuilder.proxy(ProxySelector.of(proxyAddress));
         return httpClientBuilder.build();
+    }
+
+    public static void validateProxy(String proxyStr) {
+        if (StringUtils.isNotBlank(proxyStr)) {
+            parseProxyAddress(proxyStr);
+        }
+    }
+
+    private static InetSocketAddress parseProxyAddress(String proxyStr) {
+        String[] proxyParts = StringUtils.splitPreserveAllTokens(proxyStr, ':');
+        if (proxyParts == null || proxyParts.length != 2) {
+            throw new IllegalArgumentException("代理格式应为 host:port");
+        }
+        String host = StringUtils.trim(proxyParts[0]);
+        String portText = StringUtils.trim(proxyParts[1]);
+        if (StringUtils.isBlank(host) || StringUtils.isBlank(portText)) {
+            throw new IllegalArgumentException("代理格式应为 host:port");
+        }
+
+        int port;
+        try {
+            port = Integer.parseInt(portText);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("代理端口必须是数字", e);
+        }
+        if (port < 1 || port > 65535) {
+            throw new IllegalArgumentException("代理端口必须在 1-65535 之间");
+        }
+        return InetSocketAddress.createUnresolved(host, port);
     }
 
     public String get(String url) throws HttpRequestException {

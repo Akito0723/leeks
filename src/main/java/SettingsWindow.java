@@ -99,6 +99,9 @@ public class SettingsWindow implements Configurable {
         if (StringUtils.isNotEmpty(errorMsg)) {
             throw new ConfigurationException(errorMsg);
         }
+        String proxy = inputProxy.getText().trim();
+        HttpClientManager.getInstance().configureProxy(proxy);
+
         PropertiesComponent instance = PropertiesComponent.getInstance();
         instance.setValue("key_funds", textAreaFund.getText());
         instance.setValue("key_stocks", textAreaStock.getText());
@@ -110,9 +113,7 @@ public class SettingsWindow implements Configurable {
         instance.setValue("key_table_striped", checkBoxTableStriped.isSelected());
 		instance.setValue("key_stock_api", String.valueOf(stockComboBox.getSelectedItem()));
         instance.setValue("key_close_log",checkboxLog.isSelected());
-        String proxy = inputProxy.getText().trim();
         instance.setValue("key_proxy",proxy);
-        HttpClientManager.getInstance().configureProxy(proxy);
 
 		Project project = CommonDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext(panel));
 		if (project != null) {
@@ -131,12 +132,13 @@ public class SettingsWindow implements Configurable {
 
 
 	private void testProxy(String proxy) {
-		if (proxy.indexOf('：') > 0) {
-			LogUtil.notifyInfo("别用中文分割符啊!");
+		if (StringUtils.isBlank(proxy)) {
+			LogUtil.notifyWarn("请输入代理地址");
 			return;
 		}
 		HttpClientManager httpClientManager = HttpClientManager.getInstance();
 		try {
+			HttpClientManager.validateProxy(proxy);
 			httpClientManager.getWithProxy("https://www.baidu.com", proxy);
 			LogUtil.notifyInfo("代理测试成功!请保存");
 		} catch (Exception e) {
@@ -191,6 +193,11 @@ public class SettingsWindow implements Configurable {
      */
     private String checkConfig() {
         StringBuilder errorMsg = new StringBuilder();
+		try {
+			HttpClientManager.validateProxy(inputProxy.getText().trim());
+		} catch (IllegalArgumentException e) {
+			errorMsg.append(e.getMessage()).append('、');
+		}
         errorMsg.append(splitConfigValue(cronExpressionFund.getText(), ";").stream().map(s -> {
             if (QuartzManager.checkCronExpression(s)) {
 				return "";
