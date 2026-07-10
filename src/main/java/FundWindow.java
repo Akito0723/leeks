@@ -2,6 +2,7 @@ import com.intellij.ide.util.PropertiesComponent;
 import handler.BaseTableRefreshHandler;
 import handler.fund.impl.TianTianFundHandler;
 import org.apache.commons.lang3.StringUtils;
+import utils.WindowUtils;
 
 import java.util.List;
 
@@ -16,6 +17,9 @@ public class FundWindow extends BaseLeeksWindow {
 
 	public FundWindow() {
 		super();
+		WindowUtils.TableRowMouseAdapter tableRowMouseAdapter =
+				new WindowUtils.TableRowMouseAdapter(table, baseTableRefreshHandler);
+		table.addMouseListener(tableRowMouseAdapter);
 	}
 
 	@Override
