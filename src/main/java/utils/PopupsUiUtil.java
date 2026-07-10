@@ -26,6 +26,7 @@ public class PopupsUiUtil {
 
 	private static final String loading_text = "加载中...";
 	private static final String IMAGE_URL_KEY = "imageUrl";
+	private static final String IMAGE_LOADING_KEY = "imageLoading";
 	private static final Dimension IMAGE_PLACEHOLDER_SIZE = new Dimension(560, 360);
 	private static final Duration IMAGE_REQUEST_TIMEOUT = Duration.ofSeconds(5);
 	private static final HttpClient IMAGE_HTTP_CLIENT = HttpClient.newBuilder()
@@ -131,7 +132,9 @@ public class PopupsUiUtil {
 			Component selected = tabs.getSelectedComponent();
 			if (selected instanceof JLabel label) {
 				String imageUrl = (String) label.getClientProperty(IMAGE_URL_KEY);
-				if (label.getIcon() == null && StringUtils.isNotBlank(imageUrl)) {
+				if (label.getIcon() == null
+						&& !Boolean.TRUE.equals(label.getClientProperty(IMAGE_LOADING_KEY))
+						&& StringUtils.isNotBlank(imageUrl)) {
 					loadImageAsync(label, tabs, balloon, imageUrl, project);
 				}
 			}
@@ -201,6 +204,11 @@ public class PopupsUiUtil {
 			JBTabbedPane tabs,
 			Balloon balloon,
 			String imageUrl, Project project) {
+		if (Boolean.TRUE.equals(label.getClientProperty(IMAGE_LOADING_KEY))) {
+			return;
+		}
+		label.putClientProperty(IMAGE_LOADING_KEY, true);
+		label.setText(loading_text);
 		ApplicationManager.getApplication().executeOnPooledThread(() -> {
 			try {
 				HttpRequest request = HttpRequest.newBuilder()
@@ -217,13 +225,10 @@ public class PopupsUiUtil {
 				int w = img.getWidth(null);
 				int h = img.getHeight(null);
 				if (w == -1) {
-					SwingUtilities.invokeLater(() -> {
-						if (!project.isDisposed() && !balloon.isDisposed()) {
-							label.setText("图片加载失败");
-						}
-					});
+					showImageLoadFailure(label, balloon, project);
 				} else {
 					SwingUtilities.invokeLater(() -> {
+						label.putClientProperty(IMAGE_LOADING_KEY, false);
 						if (!project.isDisposed() && !balloon.isDisposed()) {
 							label.setText(null);
 							label.setIcon(icon);
@@ -241,17 +246,18 @@ public class PopupsUiUtil {
 				}
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
-				SwingUtilities.invokeLater(() -> {
-					if (!project.isDisposed() && !balloon.isDisposed()) {
-						label.setText("图片加载失败");
-					}
-				});
+				showImageLoadFailure(label, balloon, project);
 			} catch (Exception e) {
-				SwingUtilities.invokeLater(() -> {
-					if (!project.isDisposed() && !balloon.isDisposed()) {
-						label.setText("图片加载失败");
-					}
-				});
+				showImageLoadFailure(label, balloon, project);
+			}
+		});
+	}
+
+	private static void showImageLoadFailure(JLabel label, Balloon balloon, Project project) {
+		SwingUtilities.invokeLater(() -> {
+			label.putClientProperty(IMAGE_LOADING_KEY, false);
+			if (!project.isDisposed() && !balloon.isDisposed()) {
+				label.setText("图片加载失败");
 			}
 		});
 	}
