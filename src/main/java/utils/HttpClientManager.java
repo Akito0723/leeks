@@ -51,6 +51,11 @@ public class HttpClientManager {
             return;
         }
 
+        proxyAwareClient = buildProxyClient(proxyStr);
+        LogUtil.notifyInfo("setup proxy success->" + proxyStr);
+    }
+
+    private static HttpClient buildProxyClient(String proxyStr) {
         HttpClient.Builder httpClientBuilder = newClientBuilder();
         String[] proxyParts = StringUtils.split(proxyStr, ':');
         if (proxyParts.length == 2) {
@@ -58,8 +63,7 @@ public class HttpClientManager {
             int port = Integer.parseInt(proxyParts[1]);
             httpClientBuilder.proxy(ProxySelector.of(new InetSocketAddress(host, port)));
         }
-        LogUtil.notifyInfo("setup proxy success->" + proxyStr);
-        proxyAwareClient = httpClientBuilder.build();
+        return httpClientBuilder.build();
     }
 
     public String get(String url) throws HttpRequestException {
@@ -78,6 +82,16 @@ public class HttpClientManager {
                 .POST(HttpRequest.BodyPublishers.noBody())
                 .build();
         return getResponseContent(url, request, proxyAwareClient, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public String getWithProxy(String url, String proxyStr) throws HttpRequestException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .timeout(DEFAULT_REQUEST_TIMEOUT)
+                .GET()
+                .build();
+        HttpClient client = StringUtils.isBlank(proxyStr) ? directClient : buildProxyClient(proxyStr);
+        return getResponseContent(url, request, client, HttpResponse.BodyHandlers.ofString());
     }
 
     public byte[] getBytesDirect(String url, Duration requestTimeout) throws HttpRequestException {

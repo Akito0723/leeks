@@ -136,9 +136,8 @@ public class SettingsWindow implements Configurable {
 			return;
 		}
 		HttpClientManager httpClientManager = HttpClientManager.getInstance();
-		httpClientManager.configureProxy(proxy);
 		try {
-			httpClientManager.get("https://www.baidu.com");
+			httpClientManager.getWithProxy("https://www.baidu.com", proxy);
 			LogUtil.notifyInfo("代理测试成功!请保存");
 		} catch (Exception e) {
 			log.error("代理测试异常,原因:", e);
