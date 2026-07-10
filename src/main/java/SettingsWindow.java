@@ -91,7 +91,22 @@ public class SettingsWindow implements Configurable {
 
     @Override
     public boolean isModified() {
-        return true;
+        PropertiesComponent instance = PropertiesComponent.getInstance();
+        return !StringUtils.equals(textAreaFund.getText(), instance.getValue("key_funds", ""))
+                || !StringUtils.equals(textAreaStock.getText(), instance.getValue("key_stocks", ""))
+                || !StringUtils.equals(textAreaCoin.getText(), instance.getValue("key_coins", ""))
+                || checkbox.isSelected() == instance.getBoolean("key_colorful")
+                || checkBoxTableStriped.isSelected() != instance.getBoolean("key_table_striped")
+                || !StringUtils.equals(String.valueOf(stockComboBox.getSelectedItem()),
+                        instance.getValue("key_stock_api", "腾讯财经"))
+                || checkboxLog.isSelected() != instance.getBoolean("key_close_log")
+                || !StringUtils.equals(cronExpressionFund.getText(),
+                        instance.getValue("key_cron_expression_fund", "0 * * * * ?"))
+                || !StringUtils.equals(cronExpressionStock.getText(),
+                        instance.getValue("key_cron_expression_stock", "*/10 * * * * ?"))
+                || !StringUtils.equals(cronExpressionCoin.getText(),
+                        instance.getValue("key_cron_expression_coin", "*/10 * * * * ?"))
+                || !StringUtils.equals(inputProxy.getText().trim(), instance.getValue("key_proxy", ""));
     }
 
     @Override
