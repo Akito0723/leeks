@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 import quartz.QuartzManager;
@@ -189,8 +190,9 @@ public class SettingsWindow implements Configurable {
         Set<String> set = new LinkedHashSet<>();
         String[] codes = value.split(split);
         for (String code : codes) {
-            if (!code.isEmpty()) {
-                set.add(code.trim());
+            String trimmedCode = StringUtils.trim(code);
+            if (StringUtils.isNotEmpty(trimmedCode)) {
+                set.add(trimmedCode);
             }
         }
         return new ArrayList<>(set);
@@ -198,22 +200,34 @@ public class SettingsWindow implements Configurable {
 
     public static List<String> getConfigList(String key) {
         String value = PropertiesComponent.getInstance().getValue(key);
+        return parseInstrumentConfig(value);
+    }
+
+    static List<String> parseInstrumentConfig(String value) {
         if (StringUtils.isEmpty(value)) {
             return new ArrayList<>();
         }
-        Set<String> set = new LinkedHashSet<>();
-        String[] codes = null;
         if (value.contains(";")) {//包含分号
-            codes = value.split("[;]");
-        } else {
-            codes = value.split("[,，]");
+            return splitConfigValue(value, ";");
         }
-        for (String code : codes) {
-            if (!code.isEmpty()) {
-                set.add(code.trim());
-            }
+        if (isSinglePositionConfig(value)) {
+            return List.of(StringUtils.trim(value));
         }
-        return new ArrayList<>(set);
+        return splitConfigValue(value, "[,，]");
+    }
+
+    private static boolean isSinglePositionConfig(String value) {
+        String[] parts = StringUtils.splitPreserveAllTokens(value, ',');
+        if (parts == null || parts.length != 3) {
+            return false;
+        }
+        String code = StringUtils.trim(parts[0]);
+        String costPrice = StringUtils.trim(parts[1]);
+        String position = StringUtils.trim(parts[2]);
+        boolean legacyFundCodeList = code.matches("\\d{6}")
+                && costPrice.matches("\\d{6}") && position.matches("\\d{6}");
+        return !legacyFundCodeList && StringUtils.isNotEmpty(code)
+                && NumberUtils.isCreatable(costPrice) && NumberUtils.isCreatable(position);
     }
 
     /**
