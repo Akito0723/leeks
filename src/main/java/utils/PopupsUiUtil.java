@@ -11,7 +11,12 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 
 /**
  * intellij ui 弹窗展示工具类 <br>
@@ -22,6 +27,11 @@ public class PopupsUiUtil {
 	private static final String loading_text = "加载中...";
 	private static final String IMAGE_URL_KEY = "imageUrl";
 	private static final Dimension IMAGE_PLACEHOLDER_SIZE = new Dimension(560, 360);
+	private static final Duration IMAGE_REQUEST_TIMEOUT = Duration.ofSeconds(5);
+	private static final HttpClient IMAGE_HTTP_CLIENT = HttpClient.newBuilder()
+			.connectTimeout(Duration.ofSeconds(2))
+			.followRedirects(HttpClient.Redirect.NORMAL)
+			.build();
 
 	private static final Object BALLOON_LOCK = new Object();
 	private static Balloon balloonInstance;
@@ -193,8 +203,16 @@ public class PopupsUiUtil {
 			String imageUrl, Project project) {
 		ApplicationManager.getApplication().executeOnPooledThread(() -> {
 			try {
-				URI uri = new URI(imageUrl);
-				ImageIcon icon = new ImageIcon(uri.toURL());
+				HttpRequest request = HttpRequest.newBuilder()
+						.uri(URI.create(imageUrl))
+						.timeout(IMAGE_REQUEST_TIMEOUT)
+						.GET()
+						.build();
+				HttpResponse<byte[]> response = IMAGE_HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofByteArray());
+				if (response.statusCode() < 200 || response.statusCode() >= 300) {
+					throw new IOException("Unexpected HTTP status: " + response.statusCode());
+				}
+				ImageIcon icon = new ImageIcon(response.body());
 				Image img = icon.getImage();
 				int w = img.getWidth(null);
 				int h = img.getHeight(null);
@@ -221,6 +239,13 @@ public class PopupsUiUtil {
 						}
 					});
 				}
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				SwingUtilities.invokeLater(() -> {
+					if (!project.isDisposed() && !balloon.isDisposed()) {
+						label.setText("图片加载失败");
+					}
+				});
 			} catch (Exception e) {
 				SwingUtilities.invokeLater(() -> {
 					if (!project.isDisposed() && !balloon.isDisposed()) {
