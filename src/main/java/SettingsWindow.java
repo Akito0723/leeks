@@ -6,8 +6,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.Nls;
@@ -17,6 +15,7 @@ import utils.HttpClientManager;
 import utils.LogUtil;
 
 import javax.swing.*;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -32,27 +31,21 @@ public class SettingsWindow implements Configurable {
     private JTextArea textAreaFund;
     private JTextArea textAreaStock;
     private JCheckBox checkbox;
-    /**
-     * 使用tab界面，方便不同的设置分开进行控制
-     */
-    private JTabbedPane tabbedPane;
     private JCheckBox checkBoxTableStriped;
     private JTextField cronExpressionFund;
     private JTextField cronExpressionStock;
     private JTextField cronExpressionCoin;
 
-	private JComboBox stockComboBox;
-	private JLabel stockComboBoxLabel;
-//    private JCheckBox checkboxSina;
+	private JComboBox<String> stockComboBox;
 
     private JCheckBox checkboxLog;
 
     private JTextArea textAreaCoin;
 
-    private JLabel proxyLabel;
-
     private JTextField inputProxy;
     private JButton proxyTestButton;
+	private final ActionListener proxyTestActionListener = actionEvent ->
+			testProxy(inputProxy.getText().trim());
 
 
 	@Override
@@ -83,10 +76,8 @@ public class SettingsWindow implements Configurable {
         cronExpressionCoin.setText(instance.getValue("key_cron_expression_coin","*/10 * * * * ?"));
         //代理设置
         inputProxy.setText(instance.getValue("key_proxy"));
-        proxyTestButton.addActionListener(actionEvent -> {
-			String proxy = inputProxy.getText().trim();
-			testProxy(proxy);
-		});
+        proxyTestButton.removeActionListener(proxyTestActionListener);
+        proxyTestButton.addActionListener(proxyTestActionListener);
         return panel;
     }
 
@@ -134,7 +125,6 @@ public class SettingsWindow implements Configurable {
 
 		Project project = CommonDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext(panel));
 		if (project != null) {
-			ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow("leeks");
 			MainTableWindow mainTableWindow = MainTableWindow.getInstance(project);
 			if (mainTableWindow != null) {
 				mainTableWindow.getFundWindow().apply();
@@ -145,6 +135,11 @@ public class SettingsWindow implements Configurable {
 
 
 
+    }
+
+    @Override
+    public void disposeUIResources() {
+        proxyTestButton.removeActionListener(proxyTestActionListener);
     }
 
 
