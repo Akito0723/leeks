@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 import quartz.QuartzManager;
-import utils.HttpClientPool;
+import utils.HttpClientManager;
 import utils.LogUtil;
 
 import javax.swing.*;
@@ -112,7 +112,7 @@ public class SettingsWindow implements Configurable {
         instance.setValue("key_close_log",checkboxLog.isSelected());
         String proxy = inputProxy.getText().trim();
         instance.setValue("key_proxy",proxy);
-        HttpClientPool.getHttpClient().buildHttpClient(proxy);
+        HttpClientManager.getInstance().configureProxy(proxy);
 
 		Project project = CommonDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext(panel));
 		if (project != null) {
@@ -135,10 +135,10 @@ public class SettingsWindow implements Configurable {
 			LogUtil.notifyInfo("别用中文分割符啊!");
 			return;
 		}
-		HttpClientPool httpClientPool = HttpClientPool.getHttpClient();
-		httpClientPool.buildHttpClient(proxy);
+		HttpClientManager httpClientManager = HttpClientManager.getInstance();
+		httpClientManager.configureProxy(proxy);
 		try {
-			httpClientPool.get("https://www.baidu.com");
+			httpClientManager.get("https://www.baidu.com");
 			LogUtil.notifyInfo("代理测试成功!请保存");
 		} catch (Exception e) {
 			log.error("代理测试异常,原因:", e);

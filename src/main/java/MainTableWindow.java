@@ -63,7 +63,7 @@ public class MainTableWindow implements ToolWindowFactory {
 
     private void loadProxySetting() {
         String proxyStr = PropertiesComponent.getInstance().getValue("key_proxy");
-        HttpClientPool.getHttpClient().buildHttpClient(proxyStr);
+        HttpClientManager.getInstance().configureProxy(proxyStr);
     }
 
     @Override

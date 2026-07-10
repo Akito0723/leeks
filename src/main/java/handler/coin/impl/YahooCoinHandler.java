@@ -8,7 +8,7 @@ import com.google.gson.Gson;
 import com.intellij.openapi.diagnostic.Logger;
 import handler.coin.CoinRefreshHandler;
 import org.apache.commons.lang3.StringUtils;
-import utils.HttpClientPool;
+import utils.HttpClientManager;
 import utils.LogUtil;
 
 import javax.swing.*;
@@ -35,7 +35,7 @@ public class YahooCoinHandler extends CoinRefreshHandler {
 		String params = Joiner.on(",").join(leeksBeanMap.keySet());
 		String resp = "";
 		try {
-			resp = HttpClientPool.getHttpClient().get(URL + params + KEYS);
+			resp = HttpClientManager.getInstance().get(URL + params + KEYS);
 		} catch (Exception e) {
 			log.error("拉取雅虎query1.finance.yahoo.com/v7数据失败,原因:", e);
 			LogUtil.notifyError(e.getMessage());

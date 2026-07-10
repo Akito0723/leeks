@@ -11,11 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.Duration;
 
 /**
@@ -29,10 +24,6 @@ public class PopupsUiUtil {
 	private static final String IMAGE_LOADING_KEY = "imageLoading";
 	private static final Dimension IMAGE_PLACEHOLDER_SIZE = new Dimension(560, 360);
 	private static final Duration IMAGE_REQUEST_TIMEOUT = Duration.ofSeconds(5);
-	private static final HttpClient IMAGE_HTTP_CLIENT = HttpClient.newBuilder()
-			.connectTimeout(Duration.ofSeconds(2))
-			.followRedirects(HttpClient.Redirect.NORMAL)
-			.build();
 
 	private static final Object BALLOON_LOCK = new Object();
 	private static Balloon balloonInstance;
@@ -211,16 +202,8 @@ public class PopupsUiUtil {
 		label.setText(loading_text);
 		ApplicationManager.getApplication().executeOnPooledThread(() -> {
 			try {
-				HttpRequest request = HttpRequest.newBuilder()
-						.uri(URI.create(imageUrl))
-						.timeout(IMAGE_REQUEST_TIMEOUT)
-						.GET()
-						.build();
-				HttpResponse<byte[]> response = IMAGE_HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofByteArray());
-				if (response.statusCode() < 200 || response.statusCode() >= 300) {
-					throw new IOException("Unexpected HTTP status: " + response.statusCode());
-				}
-				ImageIcon icon = new ImageIcon(response.body());
+				byte[] imageBytes = HttpClientManager.getInstance().getBytesDirect(imageUrl, IMAGE_REQUEST_TIMEOUT);
+				ImageIcon icon = new ImageIcon(imageBytes);
 				Image img = icon.getImage();
 				int w = img.getWidth(null);
 				int h = img.getHeight(null);
@@ -244,9 +227,6 @@ public class PopupsUiUtil {
 						}
 					});
 				}
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				showImageLoadFailure(label, balloon, project);
 			} catch (Exception e) {
 				showImageLoadFailure(label, balloon, project);
 			}

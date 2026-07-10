@@ -6,7 +6,7 @@ import com.google.common.base.Joiner;
 import com.intellij.openapi.diagnostic.Logger;
 import handler.stock.StockTableRefreshHandler;
 import org.apache.commons.lang3.time.DateUtils;
-import utils.HttpClientPool;
+import utils.HttpClientManager;
 import utils.LogUtil;
 
 import javax.swing.*;
@@ -31,7 +31,7 @@ public class TencentStockTableHandler extends StockTableRefreshHandler {
 		String params = Joiner.on(",").join(leeksBeanMap.keySet());
 		String resp = "";
 		try {
-			resp = HttpClientPool.getHttpClient().get("http://qt.gtimg.cn/q=" + params);
+			resp = HttpClientManager.getInstance().get("http://qt.gtimg.cn/q=" + params);
 		} catch (Exception e) {
 			log.error("拉取腾讯qt.gtimg.cn数据失败,原因:", e);
 			LogUtil.notifyError(e.getMessage());

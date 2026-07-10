@@ -6,7 +6,7 @@ import com.google.gson.Gson;
 import com.intellij.openapi.diagnostic.Logger;
 import handler.fund.FundRefreshHandler;
 import org.jetbrains.annotations.NotNull;
-import utils.HttpClientPool;
+import utils.HttpClientManager;
 import utils.LogUtil;
 
 import javax.swing.*;
@@ -60,7 +60,7 @@ public class TianTianFundHandler extends FundRefreshHandler {
             futures.add(CompletableFuture.runAsync(() -> {
                 String result;
                 try {
-                    result = HttpClientPool.getHttpClient()
+                    result = HttpClientManager.getInstance()
                             .get("http://fundgz.1234567.com.cn/js/" + code + ".js?rt=" + System.currentTimeMillis());
                 } catch (Exception e) {
                     log.error("拉取天天基金fundgz.1234567.com.cn数据失败,原因:", e);

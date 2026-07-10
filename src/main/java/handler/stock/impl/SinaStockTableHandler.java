@@ -7,7 +7,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import handler.stock.StockTableRefreshHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import utils.HttpClientPool;
+import utils.HttpClientManager;
 import utils.LogUtil;
 
 import javax.swing.*;
@@ -37,7 +37,7 @@ public class SinaStockTableHandler extends StockTableRefreshHandler {
 		String params = Joiner.on(",").join(leeksBeanMap.keySet());
 		String resp = "";
 		try {
-			resp = HttpClientPool.getHttpClient().get(url + params);
+			resp = HttpClientManager.getInstance().get(url + params);
 		} catch (Exception e) {
 			log.error("拉取新浪hq.sinajs.cn数据失败,原因:", e);
 			LogUtil.notifyError(e.getMessage());

@@ -9,7 +9,7 @@ import handler.stock.StockTableRefreshHandler;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;
-import utils.HttpClientPool;
+import utils.HttpClientManager;
 import utils.LogUtil;
 
 import javax.swing.*;
@@ -48,7 +48,7 @@ public class EastMoneyTableHandler extends StockTableRefreshHandler {
 					+ "&fields=f2,f3,f4,f12,f13,f14,f15,f16,f124"
 					+ "&secids=%s";
 
-			resp = HttpClientPool.getHttpClient().get(String.format(urlFormat, genSecids()));
+			resp = HttpClientManager.getInstance().get(String.format(urlFormat, genSecids()));
 		} catch (Exception e) {
 			log.error("拉取东方财富eastmoney.com数据失败,原因:", e);
 			LogUtil.notifyError(e.getMessage());
